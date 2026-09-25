@@ -11,23 +11,42 @@ const config: Config = {
     extend: {
       colors: {
         ocean: {
-          DEFAULT: "#0f3d5c",
-          deep: "#0a2b41",
-          50: "#eef5fa",
-          100: "#d8e7f1",
-          600: "#15557f",
+          DEFAULT: "#1f5c82",
+          deep: "#143e5c",
+          bright: "#155a86",
+          50: "#e7f1f6",
+          100: "#cfe3ec",
+          600: "#1a5274",
         },
         ink: {
-          DEFAULT: "#12202b",
-          soft: "#526270",
+          DEFAULT: "#0b2540",
+          soft: "#3d5972",
         },
         gold: {
-          DEFAULT: "#c9963c",
-          dark: "#8a6320", // versão acessível para texto sobre fundo claro
-          50: "#fbf5ea",
+          DEFAULT: "#b97a22",
+          dark: "#8a5414",
+          50: "#f1dfc0",
         },
-        paper: "#faf7f0",
-        line: "#e3e8ec",
+        ok: {
+          DEFAULT: "#1f7a45",
+          soft: "#dcf1e4",
+        },
+        danger: {
+          DEFAULT: "#a32015",
+          soft: "#f8ddd8",
+        },
+        paper: "#f5f7f6",
+        raised: "#ffffff",
+        line: "#d3dee3",
+      },
+      borderRadius: {
+        card: "14px",
+      },
+      maxWidth: {
+        shell: "85rem",
+      },
+      screens: {
+        nav: "960px",
       },
       fontFamily: {
         display: ['"Fraunces Variable"', "Georgia", "serif"],
@@ -35,8 +54,8 @@ const config: Config = {
         mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(15,61,92,.04), 0 1px 3px rgba(15,61,92,.06)",
-        pop: "0 10px 30px -10px rgba(10,43,65,.35)",
+        card: "0 1px 2px rgba(11,37,64,.05), 0 8px 24px -16px rgba(11,37,64,.35)",
+        pop: "0 10px 30px -10px rgba(11,37,64,.4)",
       },
       keyframes: {
         "slide-in": { from: { transform: "translateX(-100%)" }, to: { transform: "translateX(0)" } },

@@ -8,7 +8,7 @@ import { apagarSessao, gravarSessao, lerSessao } from "@/lib/session";
 import { apiFail, fail, invalid, ok, formToObject, type ActionState } from "@/lib/actions";
 import { cadastroSchema, loginSchema, novaSenhaSchema, recuperarSenhaSchema, trocarSenhaSchema } from "@/lib/validation";
 import { rateLimit, resetRateLimit } from "@/lib/security/rate-limit";
-import { safeInternalPath } from "@/lib/security/url";
+import { destinoAposLogin } from "@/lib/security/url";
 import { requireUser } from "@/lib/auth";
 import type { SessaoResposta } from "@/lib/tipos";
 
@@ -38,6 +38,7 @@ export async function signIn(_prev: ActionState, formData: FormData): Promise<Ac
     return fail(`Muitas tentativas. Por segurança, aguarde ${min} min e tente novamente.`);
   }
 
+  let destino = "/";
   try {
     const r = await api<SessaoResposta>("/auth/login", {
       method: "POST",
@@ -45,12 +46,9 @@ export async function signIn(_prev: ActionState, formData: FormData): Promise<Ac
       autenticado: false,
     });
     await gravarSessao(r.sessao, r.expira_em);
-    // #region agent log
-    fetch("http://127.0.0.1:7340/ingest/6c2f829b-8f67-4ad5-a7ca-435195fbb921", { method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "129214" }, body: JSON.stringify({ sessionId: "129214", hypothesisId: "C", location: "actions.ts:signIn", message: "sessao gravada no cookie", data: { len: r.sessao.length, parts: r.sessao.split(".").length }, timestamp: Date.now() }) }).catch(() => {});
-    // #endregion
+    destino = destinoAposLogin(r.usuario.papeis, next);
   } catch (e) {
     if (e instanceof ApiError && (e.status === 401 || e.status === 403 || e.status === 429)) {
-      // 401: mensagem genérica (não revela se o e-mail existe). 403: conta pendente/recusada/desativada.
       return fail(MSG_LOGIN[e.code] ?? e.message);
     }
     return apiFail("auth:login", e);
@@ -58,7 +56,7 @@ export async function signIn(_prev: ActionState, formData: FormData): Promise<Ac
 
   resetRateLimit(`login:${ip}:${email}`);
   revalidatePath("/", "layout");
-  redirect(safeInternalPath(next, "/"));
+  redirect(destino);
 }
 
 export async function signUp(_prev: ActionState, formData: FormData): Promise<ActionState> {

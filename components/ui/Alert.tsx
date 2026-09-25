@@ -6,9 +6,9 @@ type Tone = "info" | "success" | "warning" | "danger";
 
 const styles: Record<Tone, string> = {
   info: "border-ocean/20 bg-ocean-50 text-ocean-deep",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-900",
-  warning: "border-amber-200 bg-amber-50 text-amber-900",
-  danger: "border-red-200 bg-red-50 text-red-900",
+  success: "border-ok/30 bg-ok-soft text-ok",
+  warning: "border-gold/40 bg-gold-50 text-gold-dark",
+  danger: "border-danger/30 bg-danger-soft text-danger",
 };
 
 const icons = { info: Info, success: CheckCircle2, warning: AlertTriangle, danger: XCircle };

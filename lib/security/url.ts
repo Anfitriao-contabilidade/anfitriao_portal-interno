@@ -1,3 +1,26 @@
+import type { Papel } from "@/lib/tipos";
+
+/** Home conforme o papel: equipe entra no painel interno. */
+export function homeDoPapel(papeis: readonly Papel[]): string {
+  return papeis.includes("admin") ? "/admin" : "/";
+}
+
+/**
+ * Destino pós-login. `next` só vale se o papel puder abrir aquela área:
+ * admin puro não cai no portal do cliente, e cliente não entra em /admin.
+ */
+export function destinoAposLogin(papeis: readonly Papel[], next: unknown): string {
+  const home = homeDoPapel(papeis);
+  const destino = safeInternalPath(next, home);
+  const caminho = destino.split("?")[0];
+  const areaAdmin = caminho === "/admin" || caminho.startsWith("/admin/");
+  const ehAdmin = papeis.includes("admin");
+  const ehCliente = papeis.includes("proprietario") || papeis.includes("coanfitriao");
+  if (areaAdmin && !ehAdmin) return home;
+  if (!areaAdmin && ehAdmin && !ehCliente) return home;
+  return destino;
+}
+
 /**
  * Aceita só caminhos internos ("/imoveis", "/impostos?x=1") como destino de
  * redirecionamento — bloqueia open redirect ("//evil.com", "https://…",

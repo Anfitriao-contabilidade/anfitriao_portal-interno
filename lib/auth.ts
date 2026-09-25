@@ -36,13 +36,7 @@ export const getSessao = cache(async (): Promise<SessaoUsuario | null> => {
       usuario: u,
     };
   } catch (e) {
-    if (sessaoPerdida(e)) {
-      // #region agent log
-      const err = e as { status?: number; code?: string };
-      fetch("http://127.0.0.1:7340/ingest/6c2f829b-8f67-4ad5-a7ca-435195fbb921", { method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "129214" }, body: JSON.stringify({ sessionId: "129214", hypothesisId: "D", location: "auth.ts:getSessao", message: "me recusou a sessao", data: { status: err.status, code: err.code }, timestamp: Date.now() }) }).catch(() => {});
-      // #endregion
-      return null;
-    }
+    if (sessaoPerdida(e)) return null;
     throw e;
   }
 });

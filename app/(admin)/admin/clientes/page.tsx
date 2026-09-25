@@ -118,7 +118,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
           {chips.map((c) => (
             <Link
               key={c.key}
-              href={{ pathname: "/clientes", query: { atuacao: c.key, ...(busca ? { q: busca } : {}) } }}
+              href={{ pathname: "/admin/clientes", query: { atuacao: c.key, ...(busca ? { q: busca } : {}) } }}
               aria-current={filtro === c.key ? "page" : undefined}
               className={cn(
                 "inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-colors",
@@ -130,7 +130,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
             </Link>
           ))}
         </nav>
-        <form role="search" className="relative w-full lg:w-72" action="/clientes">
+        <form role="search" className="relative w-full lg:w-72" action="/admin/clientes">
           <input type="hidden" name="atuacao" value={filtro} />
           <label htmlFor="busca-cliente" className="sr-only">Buscar cliente</label>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft" aria-hidden />

@@ -41,7 +41,7 @@ export async function atualizarCliente(_prev: ActionState, formData: FormData): 
   } catch (e) {
     return apiFail("clientes:update", e);
   }
-  revalidatePath("/clientes");
+  revalidatePath("/admin/clientes");
   return ok(`Cadastro de ${d.nome} atualizado.`);
 }
 
@@ -59,7 +59,7 @@ export async function aprovarCadastro(_prev: ActionState, formData: FormData): P
   } catch (e) {
     return apiFail("clientes:aprovar", e);
   }
-  revalidatePath("/clientes");
+  revalidatePath("/admin/clientes");
   // O item some da lista de pendentes (e com ele o formulário): o aviso vai pela URL.
   redirect("/clientes?cadastro=aprovado");
 }
@@ -74,6 +74,6 @@ export async function recusarCadastro(_prev: ActionState, formData: FormData): P
   } catch (e) {
     return apiFail("clientes:recusar", e);
   }
-  revalidatePath("/clientes");
+  revalidatePath("/admin/clientes");
   redirect("/clientes?cadastro=recusado");
 }

@@ -13,7 +13,7 @@ export function Card({
   id?: string;
 }) {
   return (
-    <Tag id={id} className={cn("rounded-2xl border border-line bg-white p-5 shadow-card sm:p-6", className)}>
+    <Tag id={id} className={cn("rounded-card border border-line bg-raised p-5 shadow-card sm:p-6", className)}>
       {children}
     </Tag>
   );

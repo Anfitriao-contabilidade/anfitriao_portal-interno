@@ -63,19 +63,29 @@ export default async function HomePage() {
         actions={<StatusFiscalBadge status={status} />}
       />
 
-      {totalAtrasadas > 0 && (
-        <Alert tone="danger" role="alert" className="mb-6" title={`${totalAtrasadas} obrigação(ões) vencida(s)`}>
-          Regularize para evitar multa e juros.{" "}
-          <Link href="/impostos" className="font-medium underline">
-            Ver impostos
-          </Link>
-        </Alert>
-      )}
+      <section aria-labelledby="atencao">
+        <h2 id="atencao" className="mb-3 font-display text-lg font-semibold text-ink">
+          Precisa de atenção
+        </h2>
+        {totalAtrasadas > 0 && (
+          <Alert tone="danger" role="alert" className="mb-4" title={`${totalAtrasadas} obrigação(ões) vencida(s)`}>
+            Regularize para evitar multa e juros.{" "}
+            <Link href="/impostos" className="font-medium underline">
+              Ver impostos
+            </Link>
+          </Alert>
+        )}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <StatCard label="Imóveis" value={totalImoveis} icon={<Building2 className="h-4 w-4" />} hint={<Link href="/imoveis" className="font-medium text-ocean hover:underline">Gerenciar</Link>} />
+          <StatCard label="Em aberto" value={totalPendentes} tone={totalPendentes ? "negative" : "default"} icon={<CalendarClock className="h-4 w-4" />} hint={<Link href="/impostos" className="font-medium text-ocean hover:underline">Ver todas</Link>} />
+          <StatCard label="Vencidas" value={totalAtrasadas} tone={totalAtrasadas ? "negative" : "positive"} icon={<Landmark className="h-4 w-4" />} hint={totalAtrasadas ? "Requer atenção" : "Tudo em dia"} />
+        </div>
+      </section>
 
-      <section aria-labelledby="saude">
+      <section aria-labelledby="saude" className="mt-8">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="saude" className="font-display text-lg font-semibold text-ink">
-            Saúde financeira — {fmtCompetencia(compAtual)}
+            Números — {fmtCompetencia(compAtual)}
           </h2>
           <Link href="/rentabilidade" className="inline-flex items-center gap-1 text-sm font-medium text-ocean hover:underline">
             Ver por imóvel <ArrowRight className="h-4 w-4" aria-hidden />
@@ -143,46 +153,38 @@ export default async function HomePage() {
         )}
       </section>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-1">
-          <StatCard label="Imóveis" value={totalImoveis} icon={<Building2 className="h-4 w-4" />} hint={<Link href="/imoveis" className="font-medium text-ocean hover:underline">Gerenciar</Link>} />
-          <StatCard label="Em aberto" value={totalPendentes} icon={<CalendarClock className="h-4 w-4" />} hint={<Link href="/impostos" className="font-medium text-ocean hover:underline">Ver todas</Link>} />
-          <StatCard label="Vencidas" value={totalAtrasadas} tone={totalAtrasadas ? "negative" : "default"} icon={<Landmark className="h-4 w-4" />} hint={totalAtrasadas ? "Requer atenção" : "Tudo em dia"} />
-        </div>
-
-        <Card as="section">
-          <CardHeader
-            title="Próximos vencimentos"
-            description="Obrigações lançadas pela sua equipe contábil."
-            action={
-              <Link href="/impostos" className="text-sm font-medium text-ocean hover:underline">
-                Ver todas
-              </Link>
-            }
-          />
-          {pendentes.length === 0 ? (
-            <p className="rounded-xl bg-paper px-4 py-6 text-center text-sm text-ink-soft">Nenhuma obrigação pendente — tudo em dia.</p>
-          ) : (
-            <ul className="divide-y divide-line">
-              {pendentes.map((o) => (
-                <li key={o.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-ink">
-                      {o.tipo}
-                      {o.competencia ? <span className="text-ink-soft"> · {o.competencia}</span> : null}
-                    </p>
-                    <p className="font-mono text-xs text-ink-soft">
-                      {fmtData(o.vencimento)}
-                      {o.valor != null ? ` · ${fmtBRL(num(o.valor))}` : ""}
-                    </p>
-                  </div>
-                  <ObrigacaoBadge vencimento={o.vencimento} status={o.status} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+      <Card as="section" className="mt-8">
+        <CardHeader
+          title="Próximos vencimentos"
+          description="Obrigações lançadas pela sua equipe contábil."
+          action={
+            <Link href="/impostos" className="text-sm font-medium text-ocean hover:underline">
+              Ver todas
+            </Link>
+          }
+        />
+        {pendentes.length === 0 ? (
+          <p className="rounded-xl bg-paper px-4 py-6 text-center text-sm text-ink-soft">Nenhuma obrigação pendente — tudo em dia.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {pendentes.map((o) => (
+              <li key={o.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink">
+                    {o.tipo}
+                    {o.competencia ? <span className="text-ink-soft"> · {o.competencia}</span> : null}
+                  </p>
+                  <p className="font-mono text-xs text-ink-soft">
+                    {fmtData(o.vencimento)}
+                    {o.valor != null ? ` · ${fmtBRL(num(o.valor))}` : ""}
+                  </p>
+                </div>
+                <ObrigacaoBadge vencimento={o.vencimento} status={o.status} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </>
   );
 }

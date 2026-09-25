@@ -10,6 +10,7 @@ import {
   Package,
   Receipt,
   ScanText,
+  ScrollText,
   TrendingUp,
   UserRound,
   Users,
@@ -17,11 +18,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+export type NavArea = "cliente" | "admin";
 export type NavLink = { href: string; label: string; icon: LucideIcon };
 export type NavGroup = { title: string; links: NavLink[] };
 
-// Grupos e ordem espelham o menu do Painel Interno da equipe (pedido do usuário).
-export const NAV_GROUPS: NavGroup[] = [
+export const NAV_CLIENTE: NavGroup[] = [
   { title: "Visão geral", links: [{ href: "/", label: "Início", icon: Home }] },
   {
     title: "Carteira",
@@ -46,21 +47,39 @@ export const NAV_GROUPS: NavGroup[] = [
     links: [
       { href: "/notas", label: "Notas fiscais", icon: FileText },
       { href: "/contratos", label: "Contratos", icon: FileSignature },
-      { href: "/extrato", label: "Extrato (IA)", icon: ScanText },
+      { href: "/extrato", label: "Extrato", icon: ScanText },
     ],
   },
   { title: "Fiscal", links: [{ href: "/impostos", label: "Impostos", icon: Landmark }] },
 ];
 
-export const ADMIN_GROUP: NavGroup = {
-  title: "Equipe",
-  links: [
-    { href: "/clientes", label: "Clientes", icon: Users },
-    { href: "/admin/notas", label: "Emitir notas", icon: Receipt },
-  ],
-};
+export const NAV_ADMIN: NavGroup[] = [
+  { title: "Visão geral", links: [{ href: "/admin", label: "Dashboard", icon: Home }] },
+  {
+    title: "Carteira",
+    links: [
+      { href: "/admin/clientes", label: "Clientes", icon: Users },
+      { href: "/admin/fiscal", label: "Fiscal", icon: Landmark },
+    ],
+  },
+  {
+    title: "Operação & financeiro",
+    links: [
+      { href: "/admin/financeiro", label: "Financeiro", icon: Wallet },
+      { href: "/admin/fechamento", label: "Fechamento mensal", icon: CalendarCheck },
+    ],
+  },
+  {
+    title: "Documentos",
+    links: [
+      { href: "/admin/notas", label: "Notas fiscais", icon: Receipt },
+      { href: "/admin/contratos", label: "Contratos", icon: FileSignature },
+      { href: "/admin/extrato", label: "Extrato", icon: ScanText },
+    ],
+  },
+  { title: "Sistema", links: [{ href: "/admin/auditoria", label: "Auditoria", icon: ScrollText }] },
+];
 
-/** Atalhos da barra inferior no celular (o resto fica no menu). */
 export const BOTTOM_NAV: NavLink[] = [
   { href: "/", label: "Início", icon: Home },
   { href: "/imoveis", label: "Imóveis", icon: Building2 },
@@ -68,6 +87,11 @@ export const BOTTOM_NAV: NavLink[] = [
   { href: "/impostos", label: "Impostos", icon: Landmark },
 ];
 
+export function navPorArea(area: NavArea): NavGroup[] {
+  return area === "admin" ? NAV_ADMIN : NAV_CLIENTE;
+}
+
 export function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  if (href === "/" || href === "/admin") return pathname === href;
+  return pathname === href || pathname.startsWith(href + "/");
 }

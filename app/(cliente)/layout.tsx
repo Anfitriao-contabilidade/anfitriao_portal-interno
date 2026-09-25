@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { AppShell } from "@/components/shell/AppShell";
 import { requireUser } from "@/lib/auth";
 
@@ -10,7 +11,12 @@ export const dynamic = "force-dynamic";
 // (mensagem de sucesso) se perder em ~25% dos envios (medido em teste E2E).
 // O feedback de navegação fica por conta do indicador no menu (LinkPending).
 
-export default async function PortalLayout({ children }: { children: ReactNode }) {
+export default async function ClienteLayout({ children }: { children: ReactNode }) {
   const sessao = await requireUser();
-  return <AppShell sessao={sessao}>{children}</AppShell>;
+  if (!sessao.isProprietario && !sessao.isCoanfitriao) redirect("/admin");
+  return (
+    <AppShell sessao={sessao} area="cliente">
+      {children}
+    </AppShell>
+  );
 }
