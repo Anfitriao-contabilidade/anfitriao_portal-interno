@@ -121,3 +121,63 @@ export async function criarExtrato(_prev: ActionState, formData: FormData): Prom
     return apiFail("extrato:criar", e);
   }
 }
+
+export type LinhaCusto = { nome: string; valor: string };
+
+export type PrecificacaoResultado = {
+  custo_fixo_mensal: string;
+  custo_vazio_dia: string;
+  ocupacao_pct: string;
+  noites: string;
+  fixo_por_diaria: string | null;
+  custo_variavel_diaria: string;
+  percentuais: string;
+  diaria_minima: string | null;
+  margem_pct: string;
+  diaria_recomendada: string | null;
+  custo_mensal: string;
+  custo_medio_diario: string;
+  motivo: string | null;
+  comparacao: "acima" | "abaixo" | "igual" | null;
+};
+
+function dinheiro(valor: string) {
+  const n = Number(valor.replace(",", "."));
+  return Number.isFinite(n) && n >= 0 ? n.toFixed(2) : null;
+}
+
+export async function calcularPrecificacao(entrada: {
+  fixos: LinhaCusto[];
+  variaveis: LinhaCusto[];
+  percentuais: LinhaCusto[];
+  ocupacao_pct: string;
+  margem_pct: string;
+  diaria_praticada: string;
+}): Promise<{ ok: true; resultado: PrecificacaoResultado } | { ok: false; message: string }> {
+  if (!(await getSessaoAdmin())) return { ok: false, message: "Apenas a equipe calcula a diária." };
+  const linhas = (itens: LinhaCusto[]) =>
+    itens
+      .map((item) => ({ nome: item.nome.trim() || "Custo", valor: dinheiro(item.valor) }))
+      .filter((item): item is { nome: string; valor: string } => item.valor != null);
+  const ocupacao = dinheiro(entrada.ocupacao_pct);
+  const margem = dinheiro(entrada.margem_pct);
+  if (!ocupacao || !margem) return { ok: false, message: "Informe ocupação e margem." };
+  const praticada = entrada.diaria_praticada.trim() ? dinheiro(entrada.diaria_praticada) : null;
+  try {
+    const resultado = await api<PrecificacaoResultado>("/financeiro/precificacao", {
+      method: "POST",
+      body: {
+        fixos: linhas(entrada.fixos),
+        variaveis: linhas(entrada.variaveis),
+        percentuais: linhas(entrada.percentuais),
+        ocupacao_pct: ocupacao,
+        margem_pct: margem,
+        diaria_praticada: praticada,
+      },
+    });
+    return { ok: true, resultado };
+  } catch (e) {
+    const estado = apiFail("financeiro:precificacao", e);
+    return { ok: false, message: estado.message ?? "Não foi possível calcular." };
+  }
+}
