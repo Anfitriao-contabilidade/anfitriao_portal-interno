@@ -10,18 +10,33 @@ export async function simularFiscal(_prev: ActionState, formData: FormData): Pro
   const receita = Number(String(formData.get("receita") ?? "").replace(",", "."));
   if (!Number.isFinite(receita) || receita < 0) return fail("Informe a receita mensal.");
   try {
-    const r = await api<{ imposto: string; cnae_compativel: boolean | null }>("/fiscal/simular", {
+    const perfil = String(formData.get("perfil") || "pf_locacao");
+    const r = await api<{
+      perfil: string;
+      imposto: string;
+      cnae_compativel: boolean | null;
+      detalhe: Record<string, unknown>;
+    }>("/fiscal/simular", {
       method: "POST",
       body: {
-        perfil: String(formData.get("perfil") || "pj_simples"),
+        perfil,
         receita: receita.toFixed(2),
         rbt12: formData.get("rbt12") ? Number(String(formData.get("rbt12")).replace(",", ".")).toFixed(2) : null,
         atividade_mei: String(formData.get("atividade_mei") || "servico"),
+        modo_deducao: String(formData.get("modo_deducao") || "simplificado"),
         cnae: String(formData.get("cnae") || "") || null,
       },
     });
     const cnae = r.cnae_compativel == null ? "" : r.cnae_compativel ? " CNAE compatível com hospedagem." : " CNAE fora da lista de hospedagem.";
-    return ok(`Imposto estimado: R$ ${r.imposto}.${cnae} Estimativa para apoio interno, não é apuração oficial.`);
+    const carne = perfil === "pf_locacao" || perfil === "pf_hospedagem" || perfil === "gestor_pf";
+    return {
+      ...ok(
+        carne
+          ? `DARF estimado (Carnê-Leão): R$ ${r.imposto}.${cnae} Estimativa para apoio interno, não é apuração oficial.`
+          : `Imposto estimado: R$ ${r.imposto}.${cnae} Estimativa para apoio interno, não é apuração oficial.`,
+      ),
+      resultado: { perfil: r.perfil, imposto: r.imposto, cnae_compativel: r.cnae_compativel, detalhe: r.detalhe },
+    };
   } catch (e) {
     return apiFail("fiscal:simular", e);
   }

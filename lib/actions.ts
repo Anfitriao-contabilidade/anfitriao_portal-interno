@@ -8,6 +8,8 @@ export type ActionState = {
   fieldErrors?: Record<string, string>;
   /** Muda a cada envio — permite ao formulário reagir (ex.: limpar campos). */
   ts?: number;
+  /** Payload opcional da ação, quando o formulário precisa mostrar mais que a mensagem. */
+  resultado?: Record<string, unknown>;
 };
 
 export const initialActionState: ActionState = { ok: false };

@@ -1,5 +1,6 @@
 import {
   Building2,
+  Calculator,
   CalendarCheck,
   CalendarDays,
   ClipboardCheck,
@@ -65,6 +66,7 @@ export const NAV_ADMIN: NavGroup[] = [
       { href: "/admin/imoveis", label: "Imóveis", icon: Building2 },
       { href: "/admin/parceiros", label: "Parceiros", icon: Handshake },
       { href: "/admin/fiscal", label: "Fiscal", icon: Landmark },
+      { href: "/admin/carne-leao", label: "Carnê-Leão", icon: Calculator },
     ],
   },
   {
