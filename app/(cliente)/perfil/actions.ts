@@ -29,5 +29,6 @@ export async function atualizarPerfil(_prev: ActionState, formData: FormData): P
     return apiFail("perfil", e);
   }
   revalidatePath("/", "layout");
+  revalidatePath("/admin/perfil");
   return ok("Dados atualizados com sucesso.");
 }

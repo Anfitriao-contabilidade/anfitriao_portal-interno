@@ -13,6 +13,7 @@ export type SessaoUsuario = {
   isAdmin: boolean;
   isProprietario: boolean;
   isCoanfitriao: boolean;
+  visaoSimulada?: "proprietario" | "coanfitriao" | null;
   usuario: Usuario;
 };
 

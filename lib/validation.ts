@@ -178,6 +178,16 @@ export const clienteAdminSchema = perfilBase
     path: ["documento"],
   });
 
+export const usuarioNovoSchema = perfilBase
+  .extend({
+    email: z.email("Informe um e-mail válido").trim().toLowerCase().max(254),
+    papel: z.enum(["proprietario", "coanfitriao", "ambos", "admin"], "Escolha o tipo de acesso"),
+  })
+  .refine(documentoCompativel, {
+    message: "Para Pessoa Física informe um CPF; para Pessoa Jurídica, um CNPJ",
+    path: ["documento"],
+  });
+
 // ---------------------------------------------------------------------------
 // Imóveis
 // ---------------------------------------------------------------------------

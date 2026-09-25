@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/shell/AppShell";
 import { requireUser } from "@/lib/auth";
+import { lerVisaoCliente } from "@/lib/visao";
 
 // Todas as páginas do portal dependem da sessão: nunca pré-renderizar/cachear.
 export const dynamic = "force-dynamic";
@@ -13,9 +14,19 @@ export const dynamic = "force-dynamic";
 
 export default async function ClienteLayout({ children }: { children: ReactNode }) {
   const sessao = await requireUser();
-  if (!sessao.isProprietario && !sessao.isCoanfitriao) redirect("/admin");
+  const visao = sessao.isAdmin ? await lerVisaoCliente() : null;
+  if (!sessao.isProprietario && !sessao.isCoanfitriao && !visao) redirect("/admin");
+  const exibida = visao
+    ? {
+        ...sessao,
+        isAdmin: false,
+        isProprietario: visao === "proprietario",
+        isCoanfitriao: visao === "coanfitriao",
+        visaoSimulada: visao,
+      }
+    : sessao;
   return (
-    <AppShell sessao={sessao} area="cliente">
+    <AppShell sessao={exibida} area="cliente">
       {children}
     </AppShell>
   );

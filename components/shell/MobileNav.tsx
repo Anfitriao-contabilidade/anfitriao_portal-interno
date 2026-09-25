@@ -80,23 +80,24 @@ export function MobileNav({ area, home, userSlot }: { area: NavArea; home: strin
           <div
             id="menu-mobile"
             ref={panelRef}
-            className="absolute inset-y-0 left-0 flex w-[min(20rem,86vw)] animate-slide-in flex-col bg-raised shadow-pop"
+            className="absolute inset-y-0 left-0 flex w-[min(20rem,86vw)] animate-slide-in flex-col shadow-pop"
+            style={{ backgroundColor: "#071e36" }}
           >
-            <div className="flex h-14 items-center justify-between border-b border-line px-4">
-              <Logo />
+            <div className="flex h-14 items-center justify-between border-b border-white/10 px-4" style={{ backgroundColor: "#071e36" }}>
+              <Logo tone="light" subtitulo={area === "admin" ? "Painel interno" : "Portal do cliente"} />
               <button
                 type="button"
                 onClick={close}
-                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-ink-soft hover:bg-paper"
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-white/10"
               >
                 <X className="h-5 w-5" aria-hidden />
                 <span className="sr-only">Fechar menu</span>
               </button>
             </div>
             <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-5">
-              <NavList area={area} onNavigate={close} />
+              <NavList area={area} onNavigate={close} dark />
             </div>
-            <div className="border-t border-line p-3 pb-[max(.75rem,env(safe-area-inset-bottom))]">{userSlot}</div>
+            <div className="border-t border-white/10 p-3 pb-[max(.75rem,env(safe-area-inset-bottom))]">{userSlot}</div>
           </div>
         </div>
       )}

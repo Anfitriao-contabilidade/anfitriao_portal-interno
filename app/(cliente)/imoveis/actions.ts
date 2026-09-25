@@ -32,6 +32,8 @@ function revalidar() {
   revalidatePath("/");
   revalidatePath("/rentabilidade");
   revalidatePath("/clientes");
+  revalidatePath("/admin/clientes");
+  revalidatePath("/admin/imoveis");
 }
 
 export async function adicionarImovel(_prev: ActionState, formData: FormData): Promise<ActionState> {

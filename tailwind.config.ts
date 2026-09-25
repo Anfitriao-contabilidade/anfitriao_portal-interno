@@ -38,6 +38,11 @@ const config: Config = {
         paper: "#f5f7f6",
         raised: "#ffffff",
         line: "#d3dee3",
+        menu: {
+          DEFAULT: "#0b2340",
+          muted: "#c5d4e0",
+          accent: "#c0560c",
+        },
       },
       borderRadius: {
         card: "14px",

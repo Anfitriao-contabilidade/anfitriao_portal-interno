@@ -1,9 +1,7 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import type { SessaoUsuario } from "@/lib/auth";
-import { Logo } from "./Logo";
-import { NavList } from "./NavList";
 import { MobileNav } from "./MobileNav";
+import { DesktopNav } from "./DesktopNav";
 import { UserMenu } from "./UserMenu";
 import type { NavArea } from "./nav";
 
@@ -17,7 +15,16 @@ export function AppShell({
   children: ReactNode;
 }) {
   const home = area === "admin" ? "/admin" : "/";
-  const user = <UserMenu nome={sessao.nome} email={sessao.email} isAdmin={area === "admin"} />;
+  const user = (
+    <UserMenu
+      nome={sessao.nome}
+      email={sessao.email}
+      isAdmin={area === "admin"}
+      dark
+      podeTrocar={Boolean(sessao.isAdmin || sessao.visaoSimulada)}
+      visao={sessao.visaoSimulada ?? "painel"}
+    />
+  );
 
   return (
     <div className="min-h-dvh bg-paper">
@@ -28,21 +35,11 @@ export function AppShell({
         Pular para o conteúdo
       </a>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r border-line bg-raised nav:flex">
-        <div className="flex h-16 shrink-0 items-center px-5">
-          <Link href={home} prefetch={false} aria-label={area === "admin" ? "Painel interno" : "Portal do cliente"}>
-            <Logo />
-          </Link>
-        </div>
-        <div className="flex-1 overflow-y-auto overscroll-contain px-3 pb-4 pt-1">
-          <NavList area={area} />
-        </div>
-        <div className="shrink-0 border-t border-line p-3">{user}</div>
-      </aside>
+      <DesktopNav sessao={sessao} area={area} home={home} />
 
       <MobileNav area={area} home={home} userSlot={user} />
 
-      <div className="nav:pl-[232px]">
+      <div className="nav:pl-[4.5rem]">
         {area === "admin" && (
           <p className="border-b border-gold/40 bg-gold-50 px-4 py-2 text-center font-mono text-[.68rem] uppercase tracking-[.12em] text-gold-dark nav:px-8">
             Uso interno — equipe Anfitrião

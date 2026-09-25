@@ -12,6 +12,7 @@ import {
   ScanText,
   ScrollText,
   TrendingUp,
+  Handshake,
   UserRound,
   Users,
   Wallet,
@@ -58,7 +59,11 @@ export const NAV_ADMIN: NavGroup[] = [
   {
     title: "Carteira",
     links: [
+      { href: "/admin/perfil", label: "Meu perfil", icon: UserRound },
+      { href: "/admin/usuarios", label: "Usuários", icon: Users },
       { href: "/admin/clientes", label: "Clientes", icon: Users },
+      { href: "/admin/imoveis", label: "Imóveis", icon: Building2 },
+      { href: "/admin/parceiros", label: "Parceiros", icon: Handshake },
       { href: "/admin/fiscal", label: "Fiscal", icon: Landmark },
     ],
   },
