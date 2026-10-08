@@ -168,3 +168,63 @@ export type MetricasMesApi = {
 };
 
 export type SerieImovel = { imovel_id: string; imovel_nome: string; meses: MetricasMesApi[] };
+
+// ---------------------------------------------------------------------------
+// Pagamentos (Asaas)
+// ---------------------------------------------------------------------------
+export type FormaPagamento = "indefinida" | "pix" | "boleto" | "cartao";
+export type StatusCobranca = "criando" | "erro" | "pendente" | "vencida" | "paga" | "estornada" | "contestada" | "cancelada";
+export type StatusAssinatura = "criando" | "erro" | "ativa" | "inativa" | "cancelada";
+export type CicloAssinatura = "mensal" | "trimestral" | "semestral" | "anual";
+
+export type Cobranca = {
+  id: string;
+  cliente_id: string;
+  origem: "avulsa" | "assinatura";
+  assinatura_id: string | null;
+  descricao: string | null;
+  valor: Dinheiro | null;
+  valor_liquido: Dinheiro | null;
+  vencimento: string | null;
+  pago_em: string | null;
+  forma: FormaPagamento;
+  status: StatusCobranca;
+  status_gateway: string | null;
+  url_fatura: string | null;
+  url_boleto: string | null;
+  numero_fatura: string | null;
+  erro_mensagem: string | null;
+  criado_em: string | null;
+};
+
+export type Assinatura = {
+  id: string;
+  cliente_id: string;
+  plano_id: string | null;
+  plano_titulo: string | null;
+  descricao: string | null;
+  valor: Dinheiro | null;
+  ciclo: CicloAssinatura;
+  forma: FormaPagamento;
+  proximo_vencimento: string | null;
+  status: StatusAssinatura;
+  erro_mensagem: string | null;
+  criado_em: string | null;
+};
+
+export type PlanoVitrine = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  nivel: string;
+  preco_atual: Dinheiro;
+  beneficios: string[];
+  mais_escolhido: boolean;
+};
+
+export type ConfiguracaoPagamentos = {
+  habilitado: boolean;
+  ambiente: "sandbox" | "producao";
+  webhook_configurado: boolean;
+  webhook_path: string;
+};

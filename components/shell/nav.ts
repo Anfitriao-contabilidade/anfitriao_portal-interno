@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   CalendarDays,
   ClipboardCheck,
+  CreditCard,
   FileSignature,
   FileText,
   Home,
@@ -39,6 +40,7 @@ export const NAV_CLIENTE: NavGroup[] = [
     title: "Operação & financeiro",
     links: [
       { href: "/financeiro", label: "Financeiro", icon: Wallet },
+      { href: "/pagamentos", label: "Pagamentos", icon: CreditCard },
       { href: "/operacao", label: "Operação", icon: CalendarDays },
       { href: "/estoque", label: "Estoque", icon: Package },
       { href: "/checklist", label: "Checklist de prontidão", icon: ClipboardCheck },
@@ -77,6 +79,7 @@ export const NAV_ADMIN: NavGroup[] = [
       { href: "/admin/financeiro", label: "Financeiro", icon: Wallet },
       { href: "/admin/precificacao", label: "Precificação", icon: Tags },
       { href: "/admin/planos", label: "Planos", icon: Layers },
+      { href: "/admin/pagamentos", label: "Cobranças", icon: CreditCard },
       { href: "/admin/fechamento", label: "Fechamento mensal", icon: CalendarCheck },
     ],
   },

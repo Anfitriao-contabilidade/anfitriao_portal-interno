@@ -56,3 +56,40 @@ export function NotaChecklistBadge({ nota, avaliado }: { nota: number; avaliado:
   const tone = nota >= 8 ? "success" : nota >= 5 ? "warning" : "danger";
   return <Badge tone={tone}>Nota {nota.toFixed(1).replace(".", ",")}</Badge>;
 }
+
+export function CobrancaStatusBadge({ status, vencimento }: { status: string; vencimento?: string | null }) {
+  switch (status) {
+    case "paga":
+      return <Badge tone="success" dot>Paga</Badge>;
+    case "pendente":
+      if (vencimento && vencimento < hojeISO()) return <Badge tone="danger" dot>Vencida</Badge>;
+      return <Badge tone="warning" dot>A pagar</Badge>;
+    case "vencida":
+      return <Badge tone="danger" dot>Vencida</Badge>;
+    case "estornada":
+      return <Badge tone="neutral">Estornada</Badge>;
+    case "contestada":
+      return <Badge tone="danger">Contestada</Badge>;
+    case "cancelada":
+      return <Badge tone="neutral">Cancelada</Badge>;
+    case "erro":
+      return <Badge tone="danger">Erro</Badge>;
+    default:
+      return <Badge tone="info">Gerando…</Badge>;
+  }
+}
+
+export function AssinaturaStatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case "ativa":
+      return <Badge tone="success" dot>Ativa</Badge>;
+    case "inativa":
+      return <Badge tone="warning">Inativa</Badge>;
+    case "cancelada":
+      return <Badge tone="neutral">Cancelada</Badge>;
+    case "erro":
+      return <Badge tone="danger">Erro</Badge>;
+    default:
+      return <Badge tone="info">Gerando…</Badge>;
+  }
+}

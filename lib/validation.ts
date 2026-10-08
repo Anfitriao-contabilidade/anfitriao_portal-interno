@@ -277,3 +277,38 @@ export const notaSchema = z.object({
   tomador_nome: textoOpcional(160, "Nome do hóspede"),
   tomador_documento: documentoOpcional,
 });
+
+// ---------------------------------------------------------------------------
+// Pagamentos (Asaas)
+// ---------------------------------------------------------------------------
+export const FORMAS_PAGAMENTO = ["indefinida", "pix", "boleto", "cartao"] as const;
+export const CICLOS_ASSINATURA = ["mensal", "trimestral", "semestral", "anual"] as const;
+
+const dataISO = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida");
+const dinheiro = (min: number) =>
+  z.preprocess(
+    (v) => Number(String(v ?? "").replace(",", ".")),
+    z.number().refine(Number.isFinite, "Valor inválido").min(min, `Valor mínimo: R$ ${min.toFixed(2).replace(".", ",")}`).max(1_000_000)
+  );
+
+export const cobrancaSchema = z.object({
+  cliente_id: uid,
+  valor: dinheiro(5),
+  vencimento: dataISO,
+  descricao: texto(500, "Descrição").pipe(z.string().min(3, "Descreva a cobrança")),
+  forma: z.enum(FORMAS_PAGAMENTO, "Forma de pagamento inválida"),
+});
+
+export const assinaturaAdminSchema = z.object({
+  cliente_id: uid,
+  plano_id: objectId,
+  valor: z.preprocess(emptyToUndef, dinheiro(5).optional()),
+  ciclo: z.enum(CICLOS_ASSINATURA, "Ciclo inválido"),
+  proximo_vencimento: dataISO,
+  forma: z.enum(FORMAS_PAGAMENTO, "Forma de pagamento inválida"),
+});
+
+export const assinarPlanoSchema = z.object({
+  plano_id: objectId,
+  forma: z.enum(FORMAS_PAGAMENTO, "Forma de pagamento inválida"),
+});
