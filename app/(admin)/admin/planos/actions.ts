@@ -41,7 +41,21 @@ function beneficiosDe(formData: FormData) {
     .filter(Boolean);
 }
 
-function corpo(d: z.infer<typeof planoSchema>, formData: FormData) {
+type PlanoBody = {
+  ordem: number;
+  nivel: string;
+  titulo: string;
+  descricao: string;
+  mais_escolhido: boolean;
+  tag_oferta: string | null;
+  preco_oficial: string;
+  preco_atual: string;
+  beneficios: string[];
+  faturamento: string;
+  botao: string;
+};
+
+function corpo(d: z.infer<typeof planoSchema>, formData: FormData): PlanoBody | { erro: string } {
   const oficial = dinheiro(d.preco_oficial);
   const atual = dinheiro(d.preco_atual);
   const beneficios = beneficiosDe(formData);
