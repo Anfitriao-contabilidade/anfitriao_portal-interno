@@ -12,7 +12,7 @@ export { ApiError };
  * Components, Server Actions e Route Handlers).
  *
  * - Autentica com o cookie de sessão do Firebase (Authorization: Bearer).
- * - Repassa o IP do usuário final (X-Forwarded-For) junto com o segredo
+ * - Repassa o IP do usuário final (X-Portal-Client-IP / X-Forwarded-For) junto com o segredo
  *   compartilhado X-Portal-Secret, para o rate limit/auditoria da API
  *   enxergarem o usuário, e não o servidor do portal.
  * - Erros viram ApiError com o código da API (ex.: "cadastro_pendente").
@@ -56,7 +56,11 @@ export async function api<T>(path: string, opts: Opcoes = {}): Promise<T> {
   if (env.PORTAL_PROXY_SECRET) {
     h["X-Portal-Secret"] = env.PORTAL_PROXY_SECRET;
     const ip = await ipDoCliente();
-    if (ip) h["X-Forwarded-For"] = ip;
+    if (ip) {
+      // O Traefik/proxy da API reescreve X-Forwarded-For; X-Portal-Client-IP chega intacto.
+      h["X-Portal-Client-IP"] = ip;
+      h["X-Forwarded-For"] = ip;
+    }
   }
 
   let resp: Response;
@@ -79,6 +83,16 @@ export async function api<T>(path: string, opts: Opcoes = {}): Promise<T> {
     request_id?: string;
   };
   if (!resp.ok) {
+    if (!json.error) {
+      // Resposta fora do padrão da API (ex.: 400 "Invalid host header" do ALLOWED_HOSTS,
+      // 404/502 do proxy). Loga o status para o erro não ficar mudo.
+      console.error("[api] resposta fora do padrão", path, resp.status, resp.headers.get("content-type"));
+      throw new ApiError(
+        resp.status >= 500 ? resp.status : 502,
+        "resposta_invalida",
+        `O servidor respondeu de forma inesperada (HTTP ${resp.status}). Tente novamente em instantes.`
+      );
+    }
     throw new ApiError(
       resp.status,
       json.error?.code ?? "erro",
