@@ -14,6 +14,11 @@ function papeisDe(papel: "proprietario" | "coanfitriao" | "ambos" | "admin"): Pa
   return [papel];
 }
 
+const ACESSOS = ["proprietario", "coanfitriao", "ambos", "admin"] as const;
+function ehAcesso(v: string): v is (typeof ACESSOS)[number] {
+  return (ACESSOS as readonly string[]).includes(v);
+}
+
 function revalidar() {
   revalidatePath("/admin/usuarios");
   revalidatePath("/admin/clientes");
@@ -53,11 +58,15 @@ export async function criarUsuario(_prev: ActionState, formData: FormData): Prom
 export async function atualizarUsuario(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const admin = await getSessaoAdmin();
   if (!admin) return fail(SO_EQUIPE);
-  const parsed = clienteAdminSchema.safeParse(formToObject(formData));
+  const acesso = String(formData.get("papel_acesso") ?? "");
+  if (!ehAcesso(acesso)) return fail("Escolha o tipo de acesso.");
+  // O formulário tem um único campo "Acesso"; o schema de cadastro ainda pede o perfil de atuação.
+  const parsed = clienteAdminSchema.safeParse({
+    ...formToObject(formData),
+    perfil_atuacao: acesso === "admin" ? "proprietario" : acesso,
+  });
   if (!parsed.success) return invalid(parsed.error);
   const d = parsed.data;
-  const papel = String(formData.get("papel_acesso") || d.perfil_atuacao);
-  const acesso = papel === "admin" || papel === "proprietario" || papel === "coanfitriao" || papel === "ambos" ? papel : d.perfil_atuacao;
   const ativo = formData.get("ativo") === "true";
   if (d.id === admin.id && acesso !== "admin") return fail("Você não pode remover o próprio papel de admin.");
   if (d.id === admin.id && !ativo) return fail("Você não pode desativar a própria conta.");
@@ -81,7 +90,7 @@ export async function atualizarUsuario(_prev: ActionState, formData: FormData): 
     return apiFail("usuario:atualizar", e);
   }
   revalidar();
-  return ok("Usuário atualizado.");
+  return ok(acesso === "admin" ? "Usuário atualizado como Colaborador — admin." : "Usuário atualizado.");
 }
 
 export async function gerarLinkSenha(_prev: ActionState, formData: FormData): Promise<ActionState> {

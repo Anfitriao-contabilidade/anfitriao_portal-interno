@@ -25,6 +25,20 @@ export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
       <ActionForm action={atualizarUsuario} className="grid gap-4 sm:grid-cols-2">
         <input type="hidden" name="id" value={u.id} />
         <InputField label="Nome" name="nome" defaultValue={u.nome} required maxLength={160} className="sm:col-span-2" />
+        {/* Um único campo define o papel: colaborador (admin) OU o perfil de cliente. */}
+        <SelectField
+          label="Acesso"
+          name="papel_acesso"
+          defaultValue={u.papel}
+          disabled={u.eu}
+          hint={u.eu ? "A própria conta permanece Colaborador — admin." : "Colaborador vê o painel da equipe; cliente vê só os próprios imóveis."}
+        >
+          <option value="admin">Colaborador — admin</option>
+          <option value="proprietario">Cliente — proprietário</option>
+          <option value="coanfitriao">Cliente — coanfitrião</option>
+          <option value="ambos">Cliente — proprietário e coanfitrião</option>
+        </SelectField>
+        {u.eu && <input type="hidden" name="papel_acesso" value="admin" />}
         <SelectField label="Tipo" name="tipo" defaultValue={u.tipo || "PF"}>
           <option value="PF">Pessoa física</option>
           <option value="PJ">Pessoa jurídica</option>
@@ -37,17 +51,6 @@ export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
           <option value="regular">Regular</option>
           <option value="em_verificacao">Em verificação</option>
           <option value="pendencia">Pendência</option>
-        </SelectField>
-        <SelectField label="Perfil de atuação" name="perfil_atuacao" defaultValue={u.papel === "admin" ? "proprietario" : u.papel}>
-          <option value="proprietario">Proprietário</option>
-          <option value="coanfitriao">Coanfitrião</option>
-          <option value="ambos">Proprietário + coanfitrião</option>
-        </SelectField>
-        <SelectField label="Acesso" name="papel_acesso" defaultValue={u.papel} hint={u.eu ? "A própria conta permanece admin e ativa." : undefined}>
-          <option value="proprietario">Cliente — proprietário</option>
-          <option value="coanfitriao">Cliente — coanfitrião</option>
-          <option value="ambos">Cliente — os dois</option>
-          <option value="admin">Colaborador — admin</option>
         </SelectField>
         <SelectField label="Conta" name="ativo" defaultValue={u.ativo ? "true" : "false"} disabled={u.eu}>
           <option value="true">Ativa</option>

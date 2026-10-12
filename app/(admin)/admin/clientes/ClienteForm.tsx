@@ -40,11 +40,12 @@ export function ClienteForm({ c }: { c: ClienteDados }) {
         label="Perfil de atuação"
         name="perfil_atuacao"
         defaultValue={c.perfil_atuacao || "proprietario"}
-        hint="Define o aviso de nota única de Co-Anfitrião no Início/Financeiro."
+        hint="Define o aviso de nota única de Co-Anfitrião. “Colaborador — admin” move a conta para a equipe (sai de Clientes e passa a aparecer em Usuários)."
       >
         <option value="proprietario">Proprietário</option>
         <option value="coanfitriao">Co-Anfitrião</option>
         <option value="ambos">Proprietário + Co-Anfitrião</option>
+        <option value="admin">Colaborador — admin (equipe)</option>
       </SelectField>
       <SelectField
         label="Acesso ao portal"

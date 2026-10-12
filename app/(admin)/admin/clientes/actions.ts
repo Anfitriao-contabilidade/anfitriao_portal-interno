@@ -18,7 +18,10 @@ export async function atualizarCliente(_prev: ActionState, formData: FormData): 
   const admin = await getSessaoAdmin();
   if (!admin) return fail(SO_EQUIPE);
 
-  const parsed = clienteAdminSchema.safeParse(formToObject(formData));
+  // "admin" promove a conta a colaborador da equipe; o schema só conhece os perfis de cliente.
+  const viraAdmin = formData.get("perfil_atuacao") === "admin";
+  const obj = formToObject(formData);
+  const parsed = clienteAdminSchema.safeParse(viraAdmin ? { ...obj, perfil_atuacao: "proprietario" } : obj);
   if (!parsed.success) return invalid(parsed.error);
   const d = parsed.data;
   const ativo = formData.get("ativo");
@@ -34,7 +37,7 @@ export async function atualizarCliente(_prev: ActionState, formData: FormData): 
         endereco: d.endereco ?? null,
         plano: d.plano ?? null,
         status_fiscal: d.status_fiscal,
-        papeis: papeisDe(d.perfil_atuacao),
+        papeis: viraAdmin ? ["admin"] : papeisDe(d.perfil_atuacao),
         ...(ativo === "true" || ativo === "false" ? { ativo: ativo === "true" } : {}),
       },
     });
@@ -42,6 +45,8 @@ export async function atualizarCliente(_prev: ActionState, formData: FormData): 
     return apiFail("clientes:update", e);
   }
   revalidatePath("/admin/clientes");
+  revalidatePath("/admin/usuarios");
+  if (viraAdmin) return ok(`${d.nome} agora é Colaborador — admin. A conta passa a aparecer em Usuários.`);
   return ok(`Cadastro de ${d.nome} atualizado.`);
 }
 
