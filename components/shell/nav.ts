@@ -5,6 +5,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   CreditCard,
+  FileKey,
   FileSignature,
   FileText,
   Home,
@@ -33,6 +34,7 @@ export const NAV_CLIENTE: NavGroup[] = [
     title: "Carteira",
     links: [
       { href: "/perfil", label: "Perfil", icon: UserRound },
+      { href: "/certificado", label: "Certificado digital", icon: FileKey },
       { href: "/imoveis", label: "Imóveis", icon: Building2 },
     ],
   },
@@ -67,6 +69,7 @@ export const NAV_ADMIN: NavGroup[] = [
       { href: "/admin/perfil", label: "Meu perfil", icon: UserRound },
       { href: "/admin/usuarios", label: "Usuários", icon: Users },
       { href: "/admin/clientes", label: "Clientes", icon: Users },
+      { href: "/admin/certificados", label: "Certificados digitais", icon: FileKey },
       { href: "/admin/imoveis", label: "Imóveis", icon: Building2 },
       { href: "/admin/parceiros", label: "Parceiros", icon: Handshake },
       { href: "/admin/fiscal", label: "Fiscal", icon: Landmark },

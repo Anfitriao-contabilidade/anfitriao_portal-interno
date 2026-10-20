@@ -105,3 +105,9 @@ supabase/             LEGADO — schema antigo, útil só para a migração de d
    tem os endpoints `POST /reservas`, `/lancamentos`, `/obrigacoes`).
 5. Upload/download de arquivos (a API já tem `/arquivos` com URL assinada) —
    ainda sem tela no portal.
+
+## Certificados digitais A1
+
+- **Perfil** (`/perfil#certificado`, proprietários e anfitriões): situação, metadados, envio/substituição (com confirmação) e exclusão. A página inicial avisa quando o certificado está próximo do vencimento, vencido ou inválido.
+- **Equipe** (`/admin/certificados`): lista filtrável por situação, perfil e vencimento; detalhe por usuário com cadastro em nome dele, versões e histórico de operações.
+- O upload é uma Server Action: o arquivo e a senha vão do servidor do Portal para a API (`lib/api.ts`, opção `form`) e nunca são logados nem devolvidos. Toda validação, criptografia e uso fiscal ficam na API — ver `anfitriao_api/docs/CERTIFICADOS.md`.

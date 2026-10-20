@@ -228,3 +228,83 @@ export type ConfiguracaoPagamentos = {
   webhook_configurado: boolean;
   webhook_path: string;
 };
+
+// ---------------------------------------------------------------------------
+// Certificados digitais A1 (a API nunca devolve senha, chave ou arquivo)
+// ---------------------------------------------------------------------------
+export type SituacaoCertificado = "valido" | "proximo_vencimento" | "vencido" | "invalido" | "nao_cadastrado";
+
+export type CertificadoDigital = {
+  id: string;
+  versao: number;
+  tipo: "e-cpf" | "e-cnpj" | "outro";
+  titular_nome: string;
+  titular_documento: string | null;
+  responsavel_nome: string | null;
+  numero_serie: string;
+  emissor_nome: string;
+  emissor_organizacao: string | null;
+  valido_de: string;
+  valido_ate: string;
+  dias_restantes: number;
+  impressao_digital_sha256: string;
+  algoritmo_chave: string;
+  usos: string[];
+  icp_brasil: boolean;
+  cadeia: { situacao: "nao_verificada" | "confiavel" | "nao_confiavel" | "incompleta"; detalhe: string | null };
+  revogacao: {
+    situacao: "nao_verificada" | "nao_revogado" | "revogado" | "indeterminada";
+    detalhe: string | null;
+    verificado_em: string | null;
+    revogado_em: string | null;
+  };
+  confere_com_cadastro: boolean | null;
+  nome_arquivo: string | null;
+  enviado_por_equipe: boolean;
+  criado_em: string | null;
+  ultima_verificacao_em: string | null;
+};
+
+export type CertificadoStatus = {
+  titular_uid: string;
+  situacao: SituacaoCertificado;
+  apto_para_uso: boolean;
+  motivo: string | null;
+  impedimentos: string[];
+  alerta_dias: number;
+  certificado: CertificadoDigital | null;
+};
+
+export type CertificadoUsuario = CertificadoStatus & {
+  nome: string;
+  email: string;
+  papeis: Papel[];
+  documento: string | null;
+};
+
+export type HistoricoCertificado = {
+  titular_uid: string;
+  versoes: {
+    id: string;
+    versao: number;
+    ativo: boolean;
+    titular_documento: string | null;
+    numero_serie: string;
+    emissor_nome: string;
+    valido_ate: string;
+    enviado_por: string | null;
+    enviado_por_equipe: boolean;
+    criado_em: string | null;
+    substituido_em: string | null;
+    excluido_em: string | null;
+    material_expurgado_em: string | null;
+  }[];
+  eventos: {
+    acao: string;
+    ator_id: string | null;
+    certificado_id: string | null;
+    criado_em: string;
+    ip: string | null;
+    detalhes: Record<string, unknown> | null;
+  }[];
+};

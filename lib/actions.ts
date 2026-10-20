@@ -64,6 +64,10 @@ export function apiFail(context: string, err: unknown, fieldMap: Record<string, 
     }
     if (err.status === 401) return fail("Sua sessão expirou. Entre novamente.");
     if (err.status < 500 || err.code === "servico_externo") return fail(err.message);
+    // 503 da API = dependência fora do ar/não configurada; a mensagem é escrita para o usuário.
+    if (err.status === 503 && err.code !== "resposta_invalida") {
+      return fail(`${err.message}${err.requestId ? ` (código ${err.requestId.slice(0, 8)})` : ""}`);
+    }
     console.error(`[action:${context}]`, err.status, err.code, err.requestId);
     return fail(`Não foi possível concluir a operação. Tente novamente em instantes.${err.requestId ? ` (código ${err.requestId.slice(0, 8)})` : ""}`);
   }

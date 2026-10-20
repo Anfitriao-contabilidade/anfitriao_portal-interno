@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Mail, ShieldCheck } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { carregarMeuCertificado } from "@/lib/certificado-servidor";
+import { ButtonLink } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/Alert";
+import { CertificadoDetalhes } from "@/components/domain/certificado/CertificadoDetalhes";
 import { fmtDocumento } from "@/lib/format";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -28,6 +32,9 @@ export default async function PerfilPage() {
   const p = sessao.usuario; // GET /me já resolvido por requireUser (cache da requisição)
   const perfilAtuacao =
     sessao.isProprietario && sessao.isCoanfitriao ? "ambos" : sessao.isCoanfitriao ? "coanfitriao" : "proprietario";
+  // Certificados digitais: só para Proprietários e Anfitriões (a API aplica a mesma regra).
+  const temCertificado = sessao.isProprietario || sessao.isCoanfitriao;
+  const cert = temCertificado ? await carregarMeuCertificado() : null;
   const atuacao = sessao.isAdmin
     ? { label: "Equipe Anfitrião", desc: "Acesso de administração do portal." }
     : ATUACAO[perfilAtuacao];
@@ -95,6 +102,27 @@ export default async function PerfilPage() {
           </Card>
         </div>
       </div>
+
+      {temCertificado && cert && (
+        <Card as="section" className="mt-6" id="certificado">
+          <CardHeader
+            title="Certificado digital"
+            description="Seu certificado A1 usado na emissão de notas fiscais."
+            action={
+              <ButtonLink href="/certificado" variant="secondary" size="sm">
+                {cert.status?.certificado ? "Gerenciar certificado" : "Adicionar certificado"}
+              </ButtonLink>
+            }
+          />
+          {cert.status ? (
+            <CertificadoDetalhes status={cert.status} />
+          ) : (
+            <Alert tone="warning" role="status">
+              {cert.indisponivel}
+            </Alert>
+          )}
+        </Card>
+      )}
     </>
   );
 }

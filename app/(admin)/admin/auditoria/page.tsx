@@ -14,7 +14,7 @@ type Evento = {
   criado_em: string;
 };
 
-const ENTIDADES = ["", "usuarios", "imoveis", "lancamentos", "obrigacoes_fiscais", "notas_fiscais", "fechamentos", "contratos", "extratos"];
+const ENTIDADES = ["", "usuarios", "imoveis", "lancamentos", "obrigacoes_fiscais", "notas_fiscais", "fechamentos", "contratos", "extratos", "certificados_digitais"];
 
 export const metadata = { title: "Auditoria" };
 

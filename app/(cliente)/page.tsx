@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { api, apiPagina, num, type Pagina } from "@/lib/api";
 import { ultimosNMeses, fmtBRL, fmtCompetencia } from "@/lib/metrics";
 import { fmtData } from "@/lib/format";
-import type { Obrigacao, Painel } from "@/lib/tipos";
+import type { CertificadoStatus, Obrigacao, Painel } from "@/lib/tipos";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -54,6 +54,14 @@ export default async function HomePage() {
   const primeiroNome = sessao.nome.split(" ")[0];
   const totalImoveis = painel.total_imoveis;
 
+  // Aviso preventivo do certificado digital (falha na consulta não derruba a página inicial).
+  let certificado: CertificadoStatus | null = null;
+  if (sessao.isProprietario || sessao.isCoanfitriao) {
+    certificado = await api<CertificadoStatus>("/me/certificado").catch(() => null);
+  }
+  const avisoCertificado =
+    certificado && ["proximo_vencimento", "vencido", "invalido"].includes(certificado.situacao) ? certificado : null;
+
   return (
     <>
       <PageHeader
@@ -67,6 +75,23 @@ export default async function HomePage() {
         <h2 id="atencao" className="mb-3 font-display text-lg font-semibold text-ink">
           Precisa de atenção
         </h2>
+        {avisoCertificado && (
+          <Alert
+            tone={avisoCertificado.situacao === "proximo_vencimento" ? "warning" : "danger"}
+            role="alert"
+            className="mb-4"
+            title={
+              avisoCertificado.situacao === "proximo_vencimento"
+                ? "Certificado digital próximo do vencimento"
+                : "Certificado digital com impedimento"
+            }
+          >
+            {avisoCertificado.motivo}{" "}
+            <Link href="/certificado" className="font-medium underline">
+              Ver certificado
+            </Link>
+          </Alert>
+        )}
         {totalAtrasadas > 0 && (
           <Alert tone="danger" role="alert" className="mb-4" title={`${totalAtrasadas} obrigação(ões) vencida(s)`}>
             Regularize para evitar multa e juros.{" "}

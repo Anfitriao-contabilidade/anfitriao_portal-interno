@@ -23,6 +23,8 @@ export type Pagina<T> = { items: T[]; total: number; limit: number; offset: numb
 type Opcoes = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
+  /** Upload multipart (ex.: certificado digital). Exclusivo com ``body``. Nunca é logado. */
+  form?: FormData;
   query?: Record<string, string | number | boolean | undefined | null>;
   /** Sessão explícita (ex.: logo após o login). Padrão: cookie da requisição. */
   sessao?: string | null;
@@ -48,6 +50,7 @@ export async function api<T>(path: string, opts: Opcoes = {}): Promise<T> {
 
   const h: Record<string, string> = { Accept: "application/json" };
   if (opts.body !== undefined) h["Content-Type"] = "application/json";
+  // Com FormData o fetch define o Content-Type multipart (com o boundary) sozinho.
   if (opts.autenticado !== false) {
     const sessao = opts.sessao ?? (await lerSessao());
     if (!sessao) throw new ApiError(401, "nao_autenticado", "Faça login para continuar.");
@@ -68,7 +71,7 @@ export async function api<T>(path: string, opts: Opcoes = {}): Promise<T> {
     resp = await fetch(url, {
       method: opts.method ?? "GET",
       headers: h,
-      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      body: opts.form ?? (opts.body !== undefined ? JSON.stringify(opts.body) : undefined),
       cache: "no-store",
       signal: AbortSignal.timeout(env.API_TIMEOUT_MS),
     });
