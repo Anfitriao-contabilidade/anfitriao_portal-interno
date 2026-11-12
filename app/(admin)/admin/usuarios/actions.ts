@@ -70,6 +70,11 @@ export async function atualizarUsuario(_prev: ActionState, formData: FormData): 
   const ativo = formData.get("ativo") === "true";
   if (d.id === admin.id && acesso !== "admin") return fail("Você não pode remover o próprio papel de admin.");
   if (d.id === admin.id && !ativo) return fail("Você não pode desativar a própria conta.");
+  const PERMITIDAS = ["nfse.emitir", "nfse.cancelar", "nfse.configurar", "nfse.producao"];
+  const permissoes =
+    acesso === "admin" && formData.get("permissoes_enviadas") === "1"
+      ? formData.getAll("permissoes").map(String).filter((x) => PERMITIDAS.includes(x))
+      : undefined;
 
   try {
     await api(`/usuarios/${d.id}`, {
@@ -84,6 +89,7 @@ export async function atualizarUsuario(_prev: ActionState, formData: FormData): 
         status_fiscal: d.status_fiscal,
         papeis: papeisDe(acesso),
         ativo,
+        ...(permissoes ? { permissoes } : {}),
       },
     });
   } catch (e) {

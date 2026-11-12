@@ -101,6 +101,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                         papel: papelAtual,
                         ativo: u.ativo,
                         eu: u.id === admin?.id,
+                        permissoes: u.permissoes ?? [],
                       }}
                     />
                   </div>

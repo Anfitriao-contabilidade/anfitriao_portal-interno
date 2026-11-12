@@ -47,7 +47,9 @@ Navegador ──(cookie httpOnly anf_sessao)──▶ Next.js (servidor) ──A
   leitura, com números calculados na API (mesma fórmula de `lib/metrics.ts`).
 - **Estoque e Checklist de prontidão**: por imóvel (nota calculada na API).
 - **Equipe (admin)**: Clientes (aprovação de cadastros, edição, ativar/desativar
-  acesso) e Emitir notas (NFS-e via Focus NFe, configurado na API).
+  acesso) e Notas fiscais (NFS-e Nacional: indicadores, filtros, assistente de emissão em
+  6 etapas, prestadores/autorizações, consulta, cancelamento, substituição e downloads — tudo via
+  `/nfse` da API; ver `anfitriao_api/docs/NFSE_NACIONAL.md`). O Focus NFe ficou como legado.
 
 ## Como colocar em produção
 
@@ -77,7 +79,8 @@ app/
     perfil/ imoveis/ financeiro/ operacao/ estoque/ checklist/ rentabilidade/
     impostos/ notas/ contratos/ extrato/ fechamento/
     clientes/         clientes + aprovação de cadastros (equipe)
-    admin/notas/      emissão de NFS-e (equipe)
+    admin/notas/      NFS-e Nacional (lista, emitir/, [id]/, prestadores/) + legado Focus
+    nfse/documento/   download de XML/DANFSe (redireciona para URL assinada)
   privacidade/        texto-base da política de privacidade (LGPD — revisar com o jurídico)
 components/           design system, formulários acessíveis, shell e componentes de domínio
 lib/

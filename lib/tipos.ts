@@ -22,6 +22,7 @@ export type Usuario = {
   origem: "equipe" | "cadastro_publico";
   email_verificado: boolean | null;
   ultimo_login_em: string | null;
+  permissoes?: string[];
   criado_em: string | null;
 };
 
@@ -100,6 +101,8 @@ export type NotaFiscal = {
   tomador_nome: string | null;
   status: string;
   referencia: string;
+  provedor?: string;
+  ambiente?: string | null;
   numero: string | null;
   url_pdf: string | null;
   erro_mensagem: string | null;

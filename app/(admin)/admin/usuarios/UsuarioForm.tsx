@@ -17,7 +17,15 @@ export type UsuarioEdicao = {
   papel: string;
   ativo: boolean;
   eu: boolean;
+  permissoes: string[];
 };
+
+const PERMISSOES_NFSE: [string, string][] = [
+  ["nfse.emitir", "Emitir NFS-e (rascunhos, tomadores e transmissão)"],
+  ["nfse.cancelar", "Cancelar e substituir NFS-e"],
+  ["nfse.configurar", "Configurar prestadores e autorizações"],
+  ["nfse.producao", "Operar no ambiente de PRODUÇÃO"],
+];
 
 export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
   return (
@@ -57,6 +65,19 @@ export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
           <option value="false">Desativada</option>
         </SelectField>
         {u.eu && <input type="hidden" name="ativo" value="true" />}
+        {u.papel === "admin" && (
+          <fieldset className="grid gap-2 sm:col-span-2">
+            <legend className="mb-1 font-mono text-[.7rem] font-semibold uppercase tracking-[.12em] text-ink-soft">
+              Permissões fiscais (NFS-e) — consulta é liberada a toda a equipe
+            </legend>
+            <input type="hidden" name="permissoes_enviadas" value="1" />
+            {PERMISSOES_NFSE.map(([v, l]) => (
+              <label key={v} className="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="permissoes" value={v} defaultChecked={u.permissoes.includes(v)} /> {l}
+              </label>
+            ))}
+          </fieldset>
+        )}
         <div className="sm:col-span-2">
           <SubmitButton>Salvar</SubmitButton>
         </div>

@@ -14,7 +14,18 @@ export function StatusFiscalBadge({ status }: { status: StatusFiscal | string | 
   }
 }
 
-export type StatusNota = "rascunho" | "processando" | "autorizada" | "erro" | "cancelada";
+export type StatusNota =
+  | "rascunho"
+  | "pronta"
+  | "processando"
+  | "autorizada"
+  | "rejeitada"
+  | "falha_comunicacao"
+  | "situacao_desconhecida"
+  | "cancelada"
+  | "substituida"
+  | "descartada"
+  | "erro";
 
 export function NotaStatusBadge({ status }: { status: StatusNota | string }) {
   switch (status) {
@@ -22,10 +33,22 @@ export function NotaStatusBadge({ status }: { status: StatusNota | string }) {
       return <Badge tone="success" dot>Autorizada</Badge>;
     case "processando":
       return <Badge tone="warning" dot>Processando</Badge>;
+    case "pronta":
+      return <Badge tone="info" dot>Pronta para envio</Badge>;
+    case "situacao_desconhecida":
+      return <Badge tone="warning" dot>Situação desconhecida</Badge>;
+    case "falha_comunicacao":
+      return <Badge tone="warning" dot>Falha de comunicação</Badge>;
+    case "rejeitada":
+      return <Badge tone="danger" dot>Rejeitada</Badge>;
     case "erro":
       return <Badge tone="danger" dot>Erro</Badge>;
     case "cancelada":
       return <Badge tone="neutral">Cancelada</Badge>;
+    case "substituida":
+      return <Badge tone="neutral">Substituída</Badge>;
+    case "descartada":
+      return <Badge tone="neutral">Descartada</Badge>;
     default:
       return <Badge tone="info">Rascunho</Badge>;
   }

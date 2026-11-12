@@ -56,6 +56,18 @@ export default async function NotasPage() {
                   <div className="flex items-center justify-between gap-4 sm:justify-end">
                     <span className="font-mono text-sm font-medium tabular-nums">{fmtBRL(num(n.valor))}</span>
                     <NotaStatusBadge status={n.status} />
+                    {n.provedor === "nfse_nacional" && (n.status === "autorizada" || n.status === "cancelada" || n.status === "substituida") && (
+                      <>
+                        <a href={`/nfse/documento/${n.id}/xml`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-ocean hover:bg-ocean-50">
+                          XML <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                          <span className="sr-only">(abre em nova aba)</span>
+                        </a>
+                        <a href={`/nfse/documento/${n.id}/danfse`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-ocean hover:bg-ocean-50">
+                          DANFSe <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                          <span className="sr-only">(abre em nova aba)</span>
+                        </a>
+                      </>
+                    )}
                     {pdf && (
                       <a href={pdf} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-ocean hover:bg-ocean-50">
                         PDF <ExternalLink className="h-3.5 w-3.5" aria-hidden />

@@ -12,6 +12,7 @@ import {
   Layers,
   Landmark,
   Package,
+  PlugZap,
   Receipt,
   ScanText,
   ScrollText,
@@ -90,6 +91,7 @@ export const NAV_ADMIN: NavGroup[] = [
     title: "Documentos",
     links: [
       { href: "/admin/notas", label: "Notas fiscais", icon: Receipt },
+      { href: "/admin/sefin", label: "Integração SEFIN", icon: PlugZap },
       { href: "/admin/contratos", label: "Contratos", icon: FileSignature },
       { href: "/admin/extrato", label: "Extrato", icon: ScanText },
     ],
