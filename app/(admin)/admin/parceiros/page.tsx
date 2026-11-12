@@ -13,6 +13,7 @@ type Parceiro = {
   id: string;
   nome: string;
   especialidade: string;
+  especialidade_outra: string | null;
   telefone: string | null;
   email: string | null;
   observacao: string | null;
@@ -72,7 +73,7 @@ export default async function ParceirosPage({ searchParams }: { searchParams: Pr
                     <span className="block text-xs text-ink-soft">{p.telefone || p.email || "Sem contato"}</span>
                   </span>
                   <span className="flex gap-2">
-                    <Badge tone="info">{ROTULO[p.especialidade] ?? p.especialidade}</Badge>
+                    <Badge tone="info">{p.especialidade === "outro" && p.especialidade_outra ? p.especialidade_outra : (ROTULO[p.especialidade] ?? p.especialidade)}</Badge>
                     <Badge tone={p.ativo ? "success" : "neutral"}>{p.ativo ? "Ativo" : "Inativo"}</Badge>
                   </span>
                 </summary>
@@ -82,6 +83,7 @@ export default async function ParceirosPage({ searchParams }: { searchParams: Pr
                       id: p.id,
                       nome: p.nome,
                       especialidade: p.especialidade,
+                      especialidade_outra: p.especialidade_outra ?? "",
                       telefone: p.telefone ?? "",
                       email: p.email ?? "",
                       observacao: p.observacao ?? "",

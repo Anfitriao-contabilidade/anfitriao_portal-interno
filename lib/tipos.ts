@@ -15,6 +15,7 @@ export type Usuario = {
   documento: string | null;
   telefone: string | null;
   endereco: string | null;
+  endereco_detalhe?: EnderecoDetalhe | null;
   plano: string | null;
   status_fiscal: "regular" | "em_verificacao" | "pendencia";
   ativo: boolean;
@@ -46,6 +47,7 @@ export type Imovel = {
   bairro: string | null;
   cidade: string | null;
   uf: string | null;
+  codigo_ibge?: string | null;
   proprietario_id: string | null;
   proprietario_externo: { nome: string; documento: string | null; email: string | null; telefone: string | null } | null;
   coanfitriao_ids: string[];
@@ -310,4 +312,16 @@ export type HistoricoCertificado = {
     ip: string | null;
     detalhes: Record<string, unknown> | null;
   }[];
+};
+
+/** Endereço estruturado do cadastro (a API mantém também o resumo em texto: `endereco`). */
+export type EnderecoDetalhe = {
+  cep?: string | null;
+  logradouro?: string | null;
+  numero?: string | null;
+  complemento?: string | null;
+  bairro?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  codigo_ibge?: string | null;
 };

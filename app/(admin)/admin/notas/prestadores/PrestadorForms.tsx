@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ActionForm, useFormState } from "@/components/forms/ActionForm";
+import { DocumentoField } from "@/components/forms/DocumentoField";
+import { EnderecoFields } from "@/components/forms/EnderecoFields";
 import { FieldGroup, InputField, SelectField, TextareaField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
 import type { Prestador } from "@/lib/nfse";
@@ -36,9 +38,6 @@ function CamposFiscais({ p, op }: { p?: Prestador; op: Opcoes }) {
       <InputField label="Razão social / nome" name="razao_social" required maxLength={300} defaultValue={p?.razao_social} className="sm:col-span-2" />
       <InputField label="Nome fantasia" name="nome_fantasia" optional maxLength={150} defaultValue={p?.nome_fantasia ?? ""} />
       <InputField label="Inscrição municipal" name="inscricao_municipal" optional maxLength={15} defaultValue={p?.inscricao_municipal ?? ""} />
-      <InputField label="Município (código IBGE)" name="codigo_municipio" required inputMode="numeric" maxLength={7} defaultValue={p?.codigo_municipio} hint="7 dígitos — é o cLocEmi da DPS." />
-      <InputField label="Nome do município" name="municipio_nome" optional defaultValue={p?.municipio_nome ?? ""} />
-      <InputField label="UF" name="uf" optional maxLength={2} defaultValue={p?.uf ?? ""} />
       <InputField label="Telefone" name="telefone" optional inputMode="tel" defaultValue={p?.telefone ?? ""} />
       <InputField label="E-mail" name="email" type="email" optional defaultValue={p?.email ?? ""} className="sm:col-span-2" />
       <FieldGroup title="Regime tributário">
@@ -58,12 +57,24 @@ function CamposFiscais({ p, op }: { p?: Prestador; op: Opcoes }) {
         <InputField label="Série" name="serie_dps" required inputMode="numeric" maxLength={5} defaultValue={p?.serie_dps ?? ""} hint="Use uma série exclusiva deste sistema (não compartilhe com o emissor web)." />
         <InputField label="Próximo número" name="proximo_numero_dps" type="number" min={1} defaultValue={p?.proximo_numero_dps ?? 1} hint="Só ajuste se já houver DPS emitidas nesta série." />
       </FieldGroup>
-      <FieldGroup title="Endereço (opcional — o Sistema Nacional usa o Cadastro Nacional)">
-        <InputField label="Logradouro" name="logradouro" optional defaultValue={p?.endereco?.logradouro ?? ""} />
-        <InputField label="Número" name="numero" optional defaultValue={p?.endereco?.numero ?? ""} />
-        <InputField label="Complemento" name="complemento" optional defaultValue={p?.endereco?.complemento ?? ""} />
-        <InputField label="Bairro" name="bairro" optional defaultValue={p?.endereco?.bairro ?? ""} />
-        <InputField label="CEP" name="cep" optional inputMode="numeric" defaultValue={p?.endereco?.cep ?? ""} />
+      <FieldGroup title="Endereço e município">
+        <EnderecoFields
+          nomes={{ cep: "cep", logradouro: "logradouro", numero: "numero", complemento: "complemento", bairro: "bairro", cidade: "municipio_nome", uf: "uf", ibge: "codigo_municipio" }}
+          valores={{
+            cep: p?.endereco?.cep,
+            logradouro: p?.endereco?.logradouro,
+            numero: p?.endereco?.numero,
+            complemento: p?.endereco?.complemento,
+            bairro: p?.endereco?.bairro,
+            cidade: p?.municipio_nome,
+            uf: p?.uf,
+            ibge: p?.codigo_municipio,
+          }}
+          ibgeObrigatorio
+        />
+        <p className="text-xs text-ink-soft sm:col-span-2">
+          O código IBGE do município é obrigatório (cLocEmi da DPS). Logradouro, número e bairro só são enviados se os três estiverem preenchidos.
+        </p>
         <label className="flex items-center gap-2 self-end text-sm">
           <input type="checkbox" name="informar_nome_endereco" defaultChecked={p?.informar_nome_endereco} /> Informar nome e endereço do prestador na DPS
         </label>
@@ -101,7 +112,7 @@ export function NovoPrestadorForm({ op, clientes, temPropria }: { op: Opcoes; cl
       ) : (
         <p className="self-end text-xs text-ink-soft">O certificado da própria empresa é cadastrado em Certificados → “empresa-propria”.</p>
       )}
-      <InputField label="CPF/CNPJ do prestador" name="documento" required inputMode="numeric" hint="Imutável depois do cadastro (define o Id da DPS e o certificado exigido)." />
+      <DocumentoField label="CPF/CNPJ do prestador" required hint="Imutável depois do cadastro (define o Id da DPS e o certificado exigido)." />
       <CamposFiscais op={op} />
       <div className="sm:col-span-2">
         <SubmitButton pendingLabel="Cadastrando…">Cadastrar prestador</SubmitButton>

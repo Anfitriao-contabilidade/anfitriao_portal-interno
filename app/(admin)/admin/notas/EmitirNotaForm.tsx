@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Calculator, Loader2, Send } from "lucide-react";
 import { ActionForm } from "@/components/forms/ActionForm";
+import { DocumentoField } from "@/components/forms/DocumentoField";
 import { InputField, SelectField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
 import { Alert } from "@/components/ui/Alert";
@@ -120,7 +121,7 @@ export function EmitirNotaForm({ clientes, imoveis }: { clientes: Cliente[]; imo
       {ehHospede && (
         <>
           <InputField label="Nome do hóspede" name="tomador_nome" optional maxLength={160} autoComplete="off" />
-          <InputField label="CPF do hóspede" name="tomador_documento" optional inputMode="numeric" maxLength={18} autoComplete="off" />
+          <DocumentoField label="CPF / CNPJ do hóspede" name="tomador_documento" optional />
         </>
       )}
 

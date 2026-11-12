@@ -2,9 +2,11 @@
 
 import { ActionForm } from "@/components/forms/ActionForm";
 import { useState } from "react";
+import { DocumentoField } from "@/components/forms/DocumentoField";
+import { EnderecoFields } from "@/components/forms/EnderecoFields";
 import { FieldGroup, InputField, SelectField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
-import { CONDICOES_IMOVEL, TIPOS_IMOVEL, UFS } from "@/lib/constants";
+import { CONDICOES_IMOVEL, TIPOS_IMOVEL } from "@/lib/constants";
 import type { ActionState } from "@/lib/actions";
 
 export type ImovelDados = {
@@ -24,6 +26,7 @@ export type ImovelDados = {
   bairro?: string | null;
   cidade?: string | null;
   uf?: string | null;
+  codigo_ibge?: string | null;
 };
 
 export function ImovelForm({
@@ -107,7 +110,7 @@ export function ImovelForm({
           {deTerceiro && (
             <>
               <InputField label="Nome do proprietário" name="prop_nome" required maxLength={200} className="sm:col-span-2" />
-              <InputField label="CPF / CNPJ do proprietário" name="prop_documento" inputMode="numeric" maxLength={18} optional />
+              <DocumentoField label="CPF / CNPJ do proprietário" name="prop_documento" optional resetOnSuccess={!im.id} />
               <InputField label="E-mail do proprietário" name="prop_email" type="email" maxLength={254} optional />
               <InputField label="Telefone do proprietário" name="prop_telefone" type="tel" inputMode="tel" maxLength={25} optional />
             </>
@@ -116,19 +119,12 @@ export function ImovelForm({
       )}
 
       <FieldGroup title="Endereço">
-        <InputField label="CEP" name="cep" defaultValue={im.cep ?? ""} inputMode="numeric" autoComplete="postal-code" maxLength={9} optional placeholder="00000-000" />
-        <InputField label="Rua / Avenida" name="rua" defaultValue={im.rua ?? ""} autoComplete="address-line1" maxLength={160} optional />
-        <InputField label="Número" name="numero" defaultValue={im.numero ?? ""} maxLength={20} optional />
-        <InputField label="Bairro" name="bairro" defaultValue={im.bairro ?? ""} maxLength={80} optional />
-        <InputField label="Cidade" name="cidade" defaultValue={im.cidade ?? ""} autoComplete="address-level2" maxLength={80} optional />
-        <SelectField label="UF" name="uf" defaultValue={im.uf ?? ""} optional>
-          <option value="">Selecione</option>
-          {UFS.map((u) => (
-            <option key={u} value={u}>
-              {u}
-            </option>
-          ))}
-        </SelectField>
+        <EnderecoFields
+          nomes={{ cep: "cep", logradouro: "rua", numero: "numero", bairro: "bairro", cidade: "cidade", uf: "uf", ibge: "codigo_ibge" }}
+          valores={{ cep: im.cep, logradouro: im.rua, numero: im.numero, bairro: im.bairro, cidade: im.cidade, uf: im.uf, ibge: im.codigo_ibge }}
+          semComplemento
+          resetOnSuccess={!im.id}
+        />
       </FieldGroup>
 
       <FieldGroup title="Detalhes">

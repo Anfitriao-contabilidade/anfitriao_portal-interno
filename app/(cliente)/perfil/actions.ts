@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { apiFail, formToObject, invalid, ok, type ActionState } from "@/lib/actions";
-import { perfilSchema } from "@/lib/validation";
+import { enderecoParaApi, perfilSchema } from "@/lib/validation";
 
 export async function atualizarPerfil(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireUser();
@@ -22,7 +22,7 @@ export async function atualizarPerfil(_prev: ActionState, formData: FormData): P
         tipo: d.tipo,
         documento: d.documento ?? null,
         telefone: d.telefone ?? null,
-        endereco: d.endereco ?? null,
+        ...enderecoParaApi(d),
       },
     });
   } catch (e) {

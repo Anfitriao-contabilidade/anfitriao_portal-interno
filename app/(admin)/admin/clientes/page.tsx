@@ -204,6 +204,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
                         documento: fmtDocumento(c.documento),
                         telefone: c.telefone ?? "",
                         endereco: c.endereco ?? "",
+                        endereco_detalhe: c.endereco_detalhe ?? null,
                         plano: c.plano ?? "",
                         status_fiscal: c.status_fiscal ?? "regular",
                         perfil_atuacao: c.perfil_atuacao ?? "proprietario",

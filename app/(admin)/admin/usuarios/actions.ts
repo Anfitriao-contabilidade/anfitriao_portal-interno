@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getSessaoAdmin } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { apiFail, fail, formToObject, invalid, ok, type ActionState } from "@/lib/actions";
-import { clienteAdminSchema, uid, usuarioNovoSchema } from "@/lib/validation";
+import { clienteAdminSchema, enderecoParaApi, uid, usuarioNovoSchema } from "@/lib/validation";
 import type { Papel } from "@/lib/tipos";
 
 const SO_EQUIPE = "Apenas a equipe pode gerenciar usuários.";
@@ -42,7 +42,7 @@ export async function criarUsuario(_prev: ActionState, formData: FormData): Prom
         tipo: d.tipo,
         documento: d.documento ?? null,
         telefone: d.telefone ?? null,
-        endereco: d.endereco ?? null,
+        ...enderecoParaApi(d),
       },
     });
     revalidar();
@@ -84,7 +84,7 @@ export async function atualizarUsuario(_prev: ActionState, formData: FormData): 
         tipo: d.tipo,
         documento: d.documento ?? null,
         telefone: d.telefone ?? null,
-        endereco: d.endereco ?? null,
+        ...enderecoParaApi(d),
         plano: d.plano ?? null,
         status_fiscal: d.status_fiscal,
         papeis: papeisDe(acesso),

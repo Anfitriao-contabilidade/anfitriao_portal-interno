@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, Check, ChevronLeft, ChevronRight, Loader2, Plus, Save, Send, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { erroDocumento, mascaraDocumento, soDigitos } from "@/lib/documentos";
 import { fmtData, fmtDataHora, fmtDocumento, hojeISO } from "@/lib/format";
 import {
   AMBIENTE_LABEL,
@@ -66,8 +67,9 @@ function inicial(nota: NotaNfse | null, prestadores: Prestador[]): Form {
   return {
     fluxo: (nota?.fluxo ?? prest?.tipo ?? "propria") as Form["fluxo"],
     prestador_id: nota?.prestador_id ?? "",
-    data_prestacao: nota?.data_prestacao?.slice(0, 10) ?? "",
-    data_competencia: nota?.data_competencia?.slice(0, 10) ?? "",
+    // Nota nova: hoje (fuso de São Paulo); editável pelo calendário. Rascunho salvo mantém as datas dele.
+    data_prestacao: nota?.data_prestacao?.slice(0, 10) || hojeISO(),
+    data_competencia: nota?.data_competencia?.slice(0, 10) || hojeISO(),
     tomador_id: nota?.tomador_id ?? "",
     intermediario_id: nota?.intermediario_id ?? "",
     servico: { ...(nota?.servico ?? {}) },
@@ -903,8 +905,15 @@ function EtapaTomador({
                 <input className={controlClass} value={t.nif} onChange={(ev) => set("nif", ev.target.value)} />
               </Campo>
             ) : (
-              <Campo label={t.tipo_pessoa === "PF" ? "CPF" : "CNPJ"} obrigatorio erro={e("documento")}>
-                <input className={controlClass} inputMode="numeric" value={t.documento} onChange={(ev) => set("documento", ev.target.value)} />
+              <Campo label={t.tipo_pessoa === "PF" ? "CPF" : "CNPJ"} obrigatorio erro={e("documento") ?? erroDocumento(t.documento, t.tipo_pessoa === "PF" ? "PF" : "PJ") ?? undefined}>
+                <input
+                  className={controlClass}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={18}
+                  value={mascaraDocumento(t.documento, t.tipo_pessoa === "PF" ? "PF" : "PJ")}
+                  onChange={(ev) => set("documento", soDigitos(ev.target.value))}
+                />
               </Campo>
             )}
             <Campo label="Nome / razão social" obrigatorio erro={e("nome")}>

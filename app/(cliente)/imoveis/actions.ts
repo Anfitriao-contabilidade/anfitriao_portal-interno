@@ -17,6 +17,7 @@ function toBody(d: ImovelInput) {
     numero: d.numero ?? null,
     bairro: d.bairro ?? null,
     cidade: d.cidade ?? null,
+    codigo_ibge: d.codigo_ibge ?? null,
     uf: d.uf ?? null,
     tipo: d.tipo ?? null,
     condicao: d.condicao ?? null,

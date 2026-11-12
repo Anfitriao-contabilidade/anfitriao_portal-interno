@@ -57,6 +57,7 @@ export default async function PerfilPage() {
               documento: fmtDocumento(p?.documento),
               telefone: p?.telefone ?? "",
               endereco: p?.endereco ?? "",
+              endereco_detalhe: p?.endereco_detalhe ?? null,
             }}
           />
         </Card>

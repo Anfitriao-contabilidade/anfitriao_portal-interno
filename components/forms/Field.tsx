@@ -75,9 +75,13 @@ export function InputField({
   hint,
   className,
   optional,
+  erroLocal,
   ...props
-}: Common & Omit<ComponentProps<"input">, "name">) {
-  const { id, error, describedBy } = useFieldProps(name, hint);
+}: Common & { erroLocal?: string } & Omit<ComponentProps<"input">, "name">) {
+  const { id, error: erroServidor, describedBy: descServidor } = useFieldProps(name, hint);
+  // erroLocal: validação feita no navegador (máscara/CPF/CEP); o erro do servidor vale quando não há.
+  const error = erroLocal ?? erroServidor;
+  const describedBy = error ? `${id}-error` : descServidor;
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} className={className} optional={optional} required={props.required}>
       <input

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { ActionForm, useFormState } from "@/components/forms/ActionForm";
+import { DocumentoField } from "@/components/forms/DocumentoField";
 import { InputField, SelectField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
 import { signUp } from "../actions";
@@ -41,6 +42,7 @@ function Aceite() {
 
 export function CadastroForm() {
   const [show, setShow] = useState(false);
+  const [tipo, setTipo] = useState<"PF" | "PJ">("PF");
   return (
     <ActionForm action={signUp} className="mt-8 space-y-4" aria-label="Criar conta no portal">
       <InputField label="Nome completo / Razão social" name="nome" autoComplete="name" required maxLength={160} />
@@ -65,11 +67,11 @@ export function CadastroForm() {
         <option value="ambos">Os dois</option>
       </SelectField>
       <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField label="Tipo de pessoa" name="tipo" defaultValue="PF" required>
+        <SelectField label="Tipo de pessoa" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value === "PJ" ? "PJ" : "PF")} required>
           <option value="PF">Pessoa Física</option>
           <option value="PJ">Pessoa Jurídica</option>
         </SelectField>
-        <InputField label="CPF / CNPJ" name="documento" inputMode="numeric" maxLength={18} optional />
+        <DocumentoField tipo={tipo} optional />
       </div>
       <InputField label="Telefone" name="telefone" type="tel" autoComplete="tel" inputMode="tel" maxLength={25} optional placeholder="(11) 99999-9999" />
       <div className="relative">

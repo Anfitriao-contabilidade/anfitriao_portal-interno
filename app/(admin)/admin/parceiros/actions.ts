@@ -13,16 +13,23 @@ const ESPECIALIDADES = ["limpeza", "lavanderia", "manutencao", "outro"] as const
 const schema = z.object({
   nome: z.string().trim().min(2, "Informe o nome").max(200),
   especialidade: z.enum(ESPECIALIDADES, "Escolha a especialidade"),
+  especialidade_outra: z.string().trim().max(80, "No máximo 80 caracteres").optional().or(z.literal("")),
   telefone: z.string().trim().max(20).optional().or(z.literal("")),
   email: z.string().trim().max(254).optional().or(z.literal("")),
   observacao: z.string().trim().max(500).optional().or(z.literal("")),
   ativo: z.enum(["true", "false"]).optional(),
+}).superRefine((d, ctx) => {
+  if (d.especialidade === "outro" && (d.especialidade_outra ?? "").length < 2) {
+    ctx.addIssue({ code: "custom", path: ["especialidade_outra"], message: "Informe qual é a especialidade" });
+  }
 });
 
 function corpo(d: z.infer<typeof schema>) {
   return {
     nome: d.nome,
     especialidade: d.especialidade,
+    // Só "Outro" guarda o texto livre; nas demais, limpa o que havia antes.
+    especialidade_outra: d.especialidade === "outro" ? d.especialidade_outra || null : null,
     telefone: d.telefone || null,
     email: d.email || null,
     observacao: d.observacao || null,

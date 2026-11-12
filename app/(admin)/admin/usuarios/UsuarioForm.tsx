@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { ActionForm } from "@/components/forms/ActionForm";
-import { InputField, SelectField } from "@/components/forms/Field";
+import { DocumentoField } from "@/components/forms/DocumentoField";
+import { EnderecoFields, valoresDeDetalhe } from "@/components/forms/EnderecoFields";
+import { FieldGroup, InputField, SelectField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
+import type { EnderecoDetalhe } from "@/lib/tipos";
 import { atualizarUsuario, gerarLinkSenha } from "./actions";
 
 export type UsuarioEdicao = {
@@ -12,6 +16,7 @@ export type UsuarioEdicao = {
   documento: string;
   telefone: string;
   endereco: string;
+  endereco_detalhe?: EnderecoDetalhe | null;
   plano: string;
   status_fiscal: string;
   papel: string;
@@ -28,6 +33,7 @@ const PERMISSOES_NFSE: [string, string][] = [
 ];
 
 export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
+  const [tipo, setTipo] = useState<"PF" | "PJ">(u.tipo === "PJ" ? "PJ" : "PF");
   return (
     <div className="grid gap-6">
       <ActionForm action={atualizarUsuario} className="grid gap-4 sm:grid-cols-2">
@@ -47,14 +53,17 @@ export function UsuarioForm({ u }: { u: UsuarioEdicao }) {
           <option value="ambos">Cliente — proprietário e coanfitrião</option>
         </SelectField>
         {u.eu && <input type="hidden" name="papel_acesso" value="admin" />}
-        <SelectField label="Tipo" name="tipo" defaultValue={u.tipo || "PF"}>
+        <SelectField label="Tipo" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value === "PJ" ? "PJ" : "PF")}>
           <option value="PF">Pessoa física</option>
           <option value="PJ">Pessoa jurídica</option>
         </SelectField>
-        <InputField label="CPF / CNPJ" name="documento" defaultValue={u.documento} maxLength={18} optional />
+        <DocumentoField defaultValue={u.documento} tipo={tipo} optional />
         <InputField label="Telefone" name="telefone" defaultValue={u.telefone} maxLength={25} optional />
         <InputField label="Plano" name="plano" defaultValue={u.plano} maxLength={60} optional />
-        <InputField label="Endereço" name="endereco" defaultValue={u.endereco} maxLength={300} optional className="sm:col-span-2" />
+        <FieldGroup title="Endereço">
+          <EnderecoFields valores={valoresDeDetalhe(u.endereco_detalhe)} legado={u.endereco_detalhe ? null : u.endereco} />
+          {!u.endereco_detalhe && u.endereco && <input type="hidden" name="endereco_legado" value={u.endereco} />}
+        </FieldGroup>
         <SelectField label="Status fiscal" name="status_fiscal" defaultValue={u.status_fiscal || "regular"}>
           <option value="regular">Regular</option>
           <option value="em_verificacao">Em verificação</option>

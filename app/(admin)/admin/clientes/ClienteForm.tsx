@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { ActionForm } from "@/components/forms/ActionForm";
-import { InputField, SelectField } from "@/components/forms/Field";
+import { DocumentoField } from "@/components/forms/DocumentoField";
+import { EnderecoFields, valoresDeDetalhe } from "@/components/forms/EnderecoFields";
+import { FieldGroup, InputField, SelectField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
+import type { EnderecoDetalhe } from "@/lib/tipos";
 import { atualizarCliente } from "./actions";
 
 export type ClienteDados = {
@@ -12,6 +16,7 @@ export type ClienteDados = {
   documento: string;
   telefone: string;
   endereco: string;
+  endereco_detalhe?: EnderecoDetalhe | null;
   plano: string;
   status_fiscal: string;
   perfil_atuacao: string;
@@ -19,18 +24,22 @@ export type ClienteDados = {
 };
 
 export function ClienteForm({ c }: { c: ClienteDados }) {
+  const [tipo, setTipo] = useState<"PF" | "PJ">(c.tipo === "PJ" ? "PJ" : "PF");
   return (
     <ActionForm action={atualizarCliente} className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="id" value={c.id} />
       <InputField label="Nome / Razão social" name="nome" defaultValue={c.nome} required maxLength={160} className="sm:col-span-2" />
-      <SelectField label="Tipo" name="tipo" defaultValue={c.tipo || "PF"}>
+      <SelectField label="Tipo" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value === "PJ" ? "PJ" : "PF")}>
         <option value="PF">Pessoa Física</option>
         <option value="PJ">Pessoa Jurídica</option>
       </SelectField>
-      <InputField label="CPF / CNPJ" name="documento" defaultValue={c.documento} inputMode="numeric" maxLength={18} optional />
+      <DocumentoField defaultValue={c.documento} tipo={tipo} optional />
       <InputField label="Telefone" name="telefone" type="tel" defaultValue={c.telefone} inputMode="tel" maxLength={25} optional />
       <InputField label="Plano" name="plano" defaultValue={c.plano} maxLength={60} optional placeholder="Básico, Padrão, Experts Essencial…" />
-      <InputField label="Endereço" name="endereco" defaultValue={c.endereco} maxLength={300} optional className="sm:col-span-2" />
+      <FieldGroup title="Endereço">
+        <EnderecoFields valores={valoresDeDetalhe(c.endereco_detalhe)} legado={c.endereco_detalhe ? null : c.endereco} />
+        {!c.endereco_detalhe && c.endereco && <input type="hidden" name="endereco_legado" value={c.endereco} />}
+      </FieldGroup>
       <SelectField label="Status fiscal" name="status_fiscal" defaultValue={c.status_fiscal || "regular"}>
         <option value="regular">Regular</option>
         <option value="em_verificacao">Em verificação</option>

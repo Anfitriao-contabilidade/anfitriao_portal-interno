@@ -96,6 +96,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                         documento: fmtDocumento(u.documento),
                         telefone: u.telefone ?? "",
                         endereco: u.endereco ?? "",
+                        endereco_detalhe: u.endereco_detalhe ?? null,
                         plano: u.plano ?? "",
                         status_fiscal: u.status_fiscal,
                         papel: papelAtual,

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getSessaoAdmin } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { apiFail, fail, formToObject, invalid, ok, type ActionState } from "@/lib/actions";
-import { clienteAdminSchema, uid } from "@/lib/validation";
+import { clienteAdminSchema, enderecoParaApi, uid } from "@/lib/validation";
 
 const SO_EQUIPE = "Apenas a equipe da Anfitrião pode gerenciar clientes.";
 
@@ -34,7 +34,7 @@ export async function atualizarCliente(_prev: ActionState, formData: FormData): 
         tipo: d.tipo,
         documento: d.documento ?? null,
         telefone: d.telefone ?? null,
-        endereco: d.endereco ?? null,
+        ...enderecoParaApi(d),
         plano: d.plano ?? null,
         status_fiscal: d.status_fiscal,
         papeis: viraAdmin ? ["admin"] : papeisDe(d.perfil_atuacao),

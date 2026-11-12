@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { cnpjValido, cpfValido, soDigitos } from "./documentos";
 import {
   CONDICOES_IMOVEL,
   PERFIS_ATUACAO,
@@ -54,33 +55,7 @@ export const uid = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/, "Identificador inv
 // ---------------------------------------------------------------------------
 // Documentos (CPF/CNPJ com dígito verificador)
 // ---------------------------------------------------------------------------
-export function soDigitos(s: string) {
-  return s.replace(/\D/g, "");
-}
-
-export function cpfValido(raw: string) {
-  const c = soDigitos(raw);
-  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
-  const calc = (len: number) => {
-    let sum = 0;
-    for (let i = 0; i < len; i++) sum += Number(c[i]) * (len + 1 - i);
-    const r = (sum * 10) % 11;
-    return r === 10 ? 0 : r;
-  };
-  return calc(9) === Number(c[9]) && calc(10) === Number(c[10]);
-}
-
-export function cnpjValido(raw: string) {
-  const c = soDigitos(raw);
-  if (c.length !== 14 || /^(\d)\1{13}$/.test(c)) return false;
-  const calc = (len: number) => {
-    const pesos = len === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    const sum = pesos.reduce((s, p, i) => s + Number(c[i]) * p, 0);
-    const r = sum % 11;
-    return r < 2 ? 0 : 11 - r;
-  };
-  return calc(12) === Number(c[12]) && calc(13) === Number(c[13]);
-}
+export { cnpjValido, cpfValido, soDigitos };
 
 const documentoOpcional = z.preprocess(
   emptyToUndef,
@@ -103,6 +78,68 @@ const telefoneOpcional = z.preprocess(
     })
     .optional()
 );
+
+const soDigitosOuUndef = (v: unknown) => (typeof v === "string" ? soDigitos(v) || undefined : undefined);
+const cepOpcional = z.preprocess(soDigitosOuUndef, z.string().length(8, "CEP deve ter 8 dígitos").optional());
+const ibgeOpcional = z.preprocess(soDigitosOuUndef, z.string().regex(/^\d{7}$/, "Código IBGE com 7 dígitos").optional());
+const ufOpcional = z.preprocess(emptyToUndef, z.enum(UFS, "UF inválida").optional());
+
+/** Campos do bloco de endereço separado (components/forms/EnderecoFields.tsx). */
+const enderecoCampos = {
+  endereco_cep: cepOpcional,
+  endereco_logradouro: textoOpcional(160, "Logradouro"),
+  endereco_numero: textoOpcional(20, "Número"),
+  endereco_complemento: textoOpcional(100, "Complemento"),
+  endereco_bairro: textoOpcional(80, "Bairro"),
+  endereco_cidade: textoOpcional(80, "Cidade"),
+  endereco_uf: ufOpcional,
+  endereco_ibge: ibgeOpcional,
+  /** Endereço antigo em texto livre: preservado se nenhum campo novo for preenchido. */
+  endereco_legado: textoOpcional(500, "Endereço"),
+};
+
+type EnderecoForm = {
+  endereco_cep?: string;
+  endereco_logradouro?: string;
+  endereco_numero?: string;
+  endereco_complemento?: string;
+  endereco_bairro?: string;
+  endereco_cidade?: string;
+  endereco_uf?: string;
+  endereco_ibge?: string;
+  endereco_legado?: string;
+};
+
+/**
+ * Converte o endereço separado do formulário para o corpo da API: o objeto
+ * estruturado (`endereco_detalhe`) e o resumo em texto (`endereco`). Sem nenhum
+ * campo preenchido, mantém o endereço antigo em texto (não envia nada) se existir;
+ * caso contrário, limpa o endereço.
+ */
+export function enderecoParaApi(d: EnderecoForm): { endereco?: string | null; endereco_detalhe?: Record<string, string> | null } {
+  const det: Record<string, string | undefined> = {
+    cep: d.endereco_cep,
+    logradouro: d.endereco_logradouro,
+    numero: d.endereco_numero,
+    complemento: d.endereco_complemento,
+    bairro: d.endereco_bairro,
+    cidade: d.endereco_cidade,
+    uf: d.endereco_uf,
+    codigo_ibge: d.endereco_ibge,
+  };
+  const limpo = Object.fromEntries(Object.entries(det).filter(([, x]) => Boolean(x))) as Record<string, string>;
+  if (Object.keys(limpo).length === 0) return d.endereco_legado ? {} : { endereco: null, endereco_detalhe: null };
+
+  const linha1 = [limpo.logradouro, limpo.numero].filter(Boolean).join(", ");
+  const rua = limpo.complemento ? `${linha1} (${limpo.complemento})` : linha1;
+  const cidadeUf = [limpo.cidade, limpo.uf].filter(Boolean).join("/");
+  let texto = [rua, limpo.bairro, cidadeUf].filter(Boolean).join(" - ");
+  if (limpo.cep) {
+    const cep = `${limpo.cep.slice(0, 5)}-${limpo.cep.slice(5)}`;
+    texto = texto ? `${texto} - CEP ${cep}` : `CEP ${cep}`;
+  }
+  return { endereco: texto.slice(0, 500), endereco_detalhe: limpo };
+}
 
 // ---------------------------------------------------------------------------
 // Autenticação
@@ -141,7 +178,7 @@ const perfilBase = z.object({
   tipo: z.enum(TIPOS_PESSOA, "Tipo inválido"),
   documento: documentoOpcional,
   telefone: telefoneOpcional,
-  endereco: textoOpcional(300, "Endereço"),
+  ...enderecoCampos,
 });
 
 const documentoCompativel = (d: { tipo: "PF" | "PJ"; documento?: string }) =>
@@ -212,10 +249,8 @@ export const imovelSchema = z.object({
       .array(z.string().max(40, "Nome de plataforma muito longo").regex(/^[a-z0-9 .\-]+$/, "Use só letras e números"))
       .max(10, "No máximo 10 plataformas")
   ),
-  cep: z.preprocess(
-    (v) => (typeof v === "string" ? soDigitos(v) || undefined : undefined),
-    z.string().length(8, "CEP deve ter 8 dígitos").optional()
-  ),
+  cep: cepOpcional,
+  codigo_ibge: ibgeOpcional,
   rua: textoOpcional(160, "Rua"),
   numero: textoOpcional(20, "Número"),
   bairro: textoOpcional(80, "Bairro"),
