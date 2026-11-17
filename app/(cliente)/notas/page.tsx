@@ -62,8 +62,12 @@ export default async function NotasPage() {
                           XML <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                           <span className="sr-only">(abre em nova aba)</span>
                         </a>
+                        <a href={`/nfse/documento/${n.id}/danfse?ver=1`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-ocean hover:bg-ocean-50">
+                          Visualizar DANFSe <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                          <span className="sr-only">(abre em nova aba)</span>
+                        </a>
                         <a href={`/nfse/documento/${n.id}/danfse`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-ocean hover:bg-ocean-50">
-                          DANFSe <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                          Baixar DANFSe <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                           <span className="sr-only">(abre em nova aba)</span>
                         </a>
                       </>

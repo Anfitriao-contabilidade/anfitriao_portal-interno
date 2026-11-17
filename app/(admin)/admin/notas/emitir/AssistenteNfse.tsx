@@ -914,6 +914,8 @@ function EtapaTomador({
                   value={mascaraDocumento(t.documento, t.tipo_pessoa === "PF" ? "PF" : "PJ")}
                   onChange={(ev) => set("documento", soDigitos(ev.target.value))}
                 />
+
+
               </Campo>
             )}
             <Campo label="Nome / razão social" obrigatorio erro={e("nome")}>

@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Forbidden } from "@/components/ui/Forbidden";
 import { NotaStatusBadge } from "@/components/domain/badges";
-import { CancelarForm, ConsultarButton, DescartarButton, LinkDocumento, SubstituirForm } from "./AcoesNota";
+import { CancelarForm, ConsultarButton, DanfseLinks, DescartarButton, EnviarEmailForm, LinkDocumento, SubstituirForm } from "./AcoesNota";
 
 export const metadata: Metadata = { title: "NFS-e" };
 
@@ -184,11 +184,47 @@ export default async function NotaNfsePage({ params }: { params: Promise<{ id: s
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {nota.nfse?.xml_disponivel && <LinkDocumento id={nota.id} tipo="xml" rotulo="XML da NFS-e" />}
-              {nota.nfse?.chave_acesso && <LinkDocumento id={nota.id} tipo="danfse" rotulo="DANFSe (PDF)" />}
+              {nota.nfse?.chave_acesso && <DanfseLinks id={nota.id} />}
               {nota.dps?.hash_assinada && <LinkDocumento id={nota.id} tipo="dps" rotulo="DPS assinada" />}
               {nota.status === "cancelada" && <LinkDocumento id={nota.id} tipo="evento" rotulo="Evento de cancelamento" />}
             </div>
           </Card>
+
+          {nota.status === "autorizada" && nota.nfse?.chave_acesso && (
+            <Card as="section">
+              <CardHeader
+                title="Enviar por e-mail"
+                description={
+                  cfg.email_automatico
+                    ? "Envio automático ligado: ao autorizar, o DANFSe oficial e o XML vão para o e-mail do tomador."
+                    : "Envia o DANFSe oficial (PDF) e o XML da NFS-e."
+                }
+              />
+              {!cfg.email_habilitado ? (
+                <Alert tone="info" title="E-mail não configurado">
+                  Configure o SMTP na API (SMTP_HOST, SMTP_USER, SMTP_PASSWORD…) para habilitar o envio.
+                </Alert>
+              ) : !p.includes("nfse.emitir") ? (
+                <p className="text-sm text-ink-soft">Você não tem permissão para enviar notas por e-mail.</p>
+              ) : (
+                <EnviarEmailForm id={nota.id} emailTomador={typeof tom.email === "string" ? tom.email : undefined} />
+              )}
+              {(nota.emails ?? []).length > 0 && (
+                <ul className="mt-4 space-y-2 border-t border-line pt-3 text-sm">
+                  {[...(nota.emails ?? [])].reverse().map((m, i) => (
+                    <li key={i} className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="min-w-0 break-words text-ink">{m.para.join(", ")}</span>
+                      <span className="flex items-center gap-2 text-xs text-ink-soft">
+                        {fmtDataHora(m.enviado_em)} · {m.automatico ? "automático" : nome(m.enviado_por)}
+                        <Badge tone={m.status === "enviado" ? "success" : "danger"}>{m.status === "enviado" ? "enviado" : "falhou"}</Badge>
+                      </span>
+                      {m.erro && <p className="w-full text-xs text-ink-soft">{m.erro}</p>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          )}
 
           <Card as="section">
             <CardHeader title="Histórico" description="Tentativas de comunicação, eventos e auditoria (sem dados sensíveis)." />

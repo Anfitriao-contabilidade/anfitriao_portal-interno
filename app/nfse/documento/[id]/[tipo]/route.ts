@@ -12,7 +12,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { id, tipo } = await params;
   if (!/^[a-f0-9]{24}$/.test(id) || !TIPOS.has(tipo)) return new NextResponse("Documento inválido.", { status: 400 });
   try {
-    const link = await api<{ url: string }>(`/nfse/notas/${id}/documentos/${tipo}`);
+    // ?ver=1 → abre o PDF no navegador (visualizar); sem o parâmetro, baixa o arquivo.
+    const disposicao = request.nextUrl.searchParams.get("ver") === "1" && tipo === "danfse" ? "inline" : "attachment";
+    const link = await api<{ url: string }>(`/nfse/notas/${id}/documentos/${tipo}?disposicao=${disposicao}`);
     const url = new URL(link.url);
     if (url.protocol !== "https:") return new NextResponse("Link inválido.", { status: 502 });
     return NextResponse.redirect(url, { status: 303 });

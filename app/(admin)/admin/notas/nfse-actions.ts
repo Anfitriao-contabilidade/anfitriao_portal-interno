@@ -383,3 +383,36 @@ export async function consultarConvenio(_prev: ActionState, formData: FormData):
   }
 }
 
+
+// ------------------------------------------------------------------ e-mail da NFS-e
+const emailSchema = z.object({
+  id: objectId,
+  destinatarios: z
+    .string()
+    .trim()
+    .max(400)
+    .transform((v) => v.split(/[,;\s]+/).filter(Boolean))
+    .pipe(z.array(z.string().email("E-mail inválido")).max(5, "No máximo 5 destinatários")),
+  mensagem: z.string().trim().max(1000, "Máximo de 1000 caracteres").optional(),
+});
+
+/** Envia DANFSe oficial + XML ao(s) destinatário(s). Vazio = e-mail cadastrado do tomador (a API decide). */
+export async function enviarEmailNfse(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  if (!(await exigirAdmin())) return fail(SO_EQUIPE);
+  const p = emailSchema.safeParse(formToObject(formData));
+  if (!p.success) {
+    const campos: Record<string, string> = {};
+    for (const i of p.error.issues) campos[String(i.path[0] ?? "")] ||= i.message;
+    return fail("Revise os campos destacados.", campos);
+  }
+  try {
+    const r = await api<{ destinatarios: string[] }>(`/nfse/notas/${p.data.id}/enviar-email`, {
+      method: "POST",
+      body: { destinatarios: p.data.destinatarios, mensagem: p.data.mensagem || null },
+    });
+    revalidar(p.data.id);
+    return ok(`E-mail enviado para ${r.destinatarios.join(", ")} (DANFSe e XML anexos).`);
+  } catch (e) {
+    return apiFail("nfse:email", e);
+  }
+}

@@ -135,6 +135,16 @@ export type ValoresNfse = {
   total_tributos?: TotalTributos | null;
 };
 
+export type EnvioEmail = {
+  para: string[];
+  enviado_em: string;
+  enviado_por: string | null;
+  automatico: boolean;
+  status: "enviado" | "falha";
+  erro?: string;
+  anexos?: string[];
+};
+
 export type NotaNfse = {
   id: string;
   provedor: string;
@@ -177,6 +187,7 @@ export type NotaNfse = {
   cancelamento: { situacao?: string; motivo?: string; codigo_motivo?: string; mensagens?: Mensagem[] } | null;
   substituicao: { nota_id?: string; chave_substituida?: string; codigo_motivo?: string; motivo?: string } | null;
   substituida_por: string | null;
+  emails?: EnvioEmail[];
   pendencias: Pendencia[];
   solicitado_por: string | null;
   transmitido_por: string | null;
@@ -218,6 +229,8 @@ export type ConfiguracaoNfse = {
   permissoes_disponiveis: Record<string, string>;
   opcoes: Record<string, Record<string, string>>;
   avisos: string[];
+  email_habilitado?: boolean;
+  email_automatico?: boolean;
 };
 
 export type Tentativa = {

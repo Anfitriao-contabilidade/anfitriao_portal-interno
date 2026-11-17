@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Ban, FileDown, RefreshCw, Replace, Trash2 } from "lucide-react";
+import { Ban, Eye, FileDown, Mail, RefreshCw, Replace, Trash2 } from "lucide-react";
 import { ActionForm, useFormState } from "@/components/forms/ActionForm";
 import { InputField, SelectField, TextareaField } from "@/components/forms/Field";
 import { SubmitButton } from "@/components/forms/SubmitButton";
-import { cancelarNfse, consultarNfse, descartarNfse, substituirNfse } from "../nfse-actions";
+import { cancelarNfse, consultarNfse, descartarNfse, enviarEmailNfse, substituirNfse } from "../nfse-actions";
 
 export function ConsultarButton({ id, rotulo = "Consultar situação" }: { id: string; rotulo?: string }) {
   return (
@@ -41,6 +41,44 @@ export function LinkDocumento({ id, tipo, rotulo }: { id: string; tipo: "xml" | 
       <FileDown className="h-4 w-4" aria-hidden /> {rotulo}
       <span className="sr-only">(abre em nova aba)</span>
     </a>
+  );
+}
+
+/** DANFSe oficial: abrir no navegador (visualizar) ou baixar o arquivo. */
+export function DanfseLinks({ id }: { id: string }) {
+  const cls = "inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-ocean/20 bg-white px-3 text-sm font-medium text-ocean hover:bg-ocean-50";
+  return (
+    <>
+      <a href={`/nfse/documento/${id}/danfse?ver=1`} target="_blank" rel="noopener noreferrer" className={cls}>
+        <Eye className="h-4 w-4" aria-hidden /> Visualizar DANFSe
+        <span className="sr-only">(abre em nova aba)</span>
+      </a>
+      <a href={`/nfse/documento/${id}/danfse`} target="_blank" rel="noopener noreferrer" className={cls}>
+        <FileDown className="h-4 w-4" aria-hidden /> Baixar DANFSe (PDF)
+        <span className="sr-only">(abre em nova aba)</span>
+      </a>
+    </>
+  );
+}
+
+export function EnviarEmailForm({ id, emailTomador }: { id: string; emailTomador?: string }) {
+  return (
+    <ActionForm action={enviarEmailNfse} className="grid gap-3">
+      <input type="hidden" name="id" value={id} />
+      <InputField
+        label="Enviar para"
+        name="destinatarios"
+        type="text"
+        defaultValue={emailTomador ?? ""}
+        placeholder="email@exemplo.com, outro@exemplo.com"
+        optional
+        hint={emailTomador ? "Padrão: e-mail do tomador. Separe vários por vírgula (máx. 5)." : "O tomador não tem e-mail cadastrado: informe um destinatário."}
+      />
+      <TextareaField label="Mensagem (opcional)" name="mensagem" rows={3} maxLength={1000} optional />
+      <SubmitButton variant="secondary" pendingLabel="Enviando…">
+        <Mail className="h-4 w-4" aria-hidden /> Enviar DANFSe e XML por e-mail
+      </SubmitButton>
+    </ActionForm>
   );
 }
 
